@@ -24,7 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\TFT.Search.Library.Models\TFT.Search.Library.Models.csproj" />
     <ProjectReference Include="..\TFT.Search.Library.Repositories\TFT.Search.Library.Repositories.csproj" />
-    <ProjectReference Include="..\TFT.Search\TFT.Search.Library.Models.csproj" />
   </ItemGroup>
 
 </Project>
