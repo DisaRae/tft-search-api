@@ -6,7 +6,7 @@ using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 namespace TFT.Search.Api.Controllers
 {
     [ApiController]
-    [Route("CurrentSet")]
+    [Route("currentset")]
     public class ChampionsController : Controller
     {
         private readonly TftRepository _repository;
