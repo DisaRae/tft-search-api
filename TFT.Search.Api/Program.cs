@@ -1,7 +1,7 @@
 using TFT.Search.Library.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 // Add services to the container.
 builder.Services.AddSingleton<TftRepository>();
 builder.Services.AddControllers();
