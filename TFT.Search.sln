@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TFT.Search.Api", "TFT.Searc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TFT.Search.Library.Models", "TFT.Search.Library.Models\TFT.Search.Library.Models.csproj", "{6E941B89-3DEF-4A3B-9298-6DC8195CC83E}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "TFT.Search", "TFT.Search\TFT.Search.njsproj", "{15E80947-515C-4D5C-83B3-4DA6385A9958}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,10 +33,6 @@ Global
 		{6E941B89-3DEF-4A3B-9298-6DC8195CC83E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E941B89-3DEF-4A3B-9298-6DC8195CC83E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E941B89-3DEF-4A3B-9298-6DC8195CC83E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{15E80947-515C-4D5C-83B3-4DA6385A9958}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{15E80947-515C-4D5C-83B3-4DA6385A9958}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{15E80947-515C-4D5C-83B3-4DA6385A9958}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{15E80947-515C-4D5C-83B3-4DA6385A9958}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
