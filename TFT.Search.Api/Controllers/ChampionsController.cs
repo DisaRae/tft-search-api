@@ -21,7 +21,7 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet, Route("champions")]
-        public IEnumerable<Champions>? Champions()
+        public IEnumerable<ChampionRaw>? Champions()
         {
             var dataset = _repository.TftData;
             if (dataset == null)
@@ -32,7 +32,7 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet,Route("champions/{name}")]
-        public IEnumerable<Champions>? Champions(string name)
+        public IEnumerable<ChampionRaw>? Champions(string name)
         {
             var dataset = _repository.TftData;
             if (dataset == null)
@@ -44,7 +44,7 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet, Route("champions/search/skills/{keyword}")]
-        public IEnumerable<Champions>? SearchChampionSkills(string keyword)
+        public IEnumerable<ChampionRaw>? SearchChampionSkills(string keyword)
         {
             var dataset = _repository.TftData;
             if (dataset == null)

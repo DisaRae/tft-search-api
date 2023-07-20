@@ -21,7 +21,7 @@ namespace TFT.Search.Library.Models
         public string Mutator { get; set; }
 
         [JsonPropertyName("champions")]
-        public List<Champions> Champions { get; set; }
+        public List<ChampionRaw> Champions { get; set; }
 
         [JsonPropertyName("traits")]
         public List<Traits> Traits { get; set; }

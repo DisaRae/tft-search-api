@@ -10,38 +10,15 @@ using static System.Net.WebRequestMethods;
 
 namespace TFT.Search.Library.Models
 {
-    public class Champions: ImageBase
+    public class Champion: ImageBase
     {
         [JsonProperty("ability")]
         [JsonPropertyName("ability")]
         public Ability Ability { get; set; }
 
-        [JsonProperty("apiName")]
-        [JsonPropertyName("apiName")]
-        public string ApiName { get; set; }
-
-        [JsonProperty("characterName")]
-        [JsonPropertyName("characterName")]
-        public string CharacterName { get; set; }
-
         [JsonProperty("cost")]
         [JsonPropertyName("cost")]
         public int? Cost { get; set; }
-
-        [JsonProperty("icon")]
-        [JsonPropertyName("icon")]
-        public string Icon
-        { 
-            get 
-            { 
-                return _imageBaseUrl + _icon.ToLower() ?? String.Empty; 
-            } 
-            set 
-            { 
-                _icon = value;
-            } 
-        }
-        private string _icon;
 
         [JsonProperty("name")]
         [JsonPropertyName("name")]
@@ -65,10 +42,6 @@ namespace TFT.Search.Library.Models
         [JsonProperty("stats")]
         [JsonPropertyName("stats")]
         public Stats Stats { get; set; }
-
-        [JsonProperty("tileIcon")]
-        [JsonPropertyName("tileIcon")]
-        public string TileIcon { get; set; }
 
         [JsonProperty("traits")]
         [JsonPropertyName("traits")]
@@ -146,17 +119,6 @@ namespace TFT.Search.Library.Models
         [JsonProperty("range")]
         [JsonPropertyName("range")]
         public double? Range { get; set; }
-    }
-
-    public class Variable
-    {
-        [JsonProperty("name")]
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("value")]
-        [JsonPropertyName("value")]
-        public List<double?> Value { get; set; }
     }
 
 }
