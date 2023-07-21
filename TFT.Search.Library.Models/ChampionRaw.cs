@@ -124,13 +124,19 @@ namespace TFT.Search.Library.Models
             var descriptionCleanedofTags = Regex.Replace(newLineAdded, "<[A-Za-z]*>|<\\/[A-Za-z]*>", "");
             var descriptionCleaned = Regex.Replace(descriptionCleanedofTags, "\\(%i:[A-Za-z]*%\\)|%[A-Za-z:]*%", "");
 
-            Regex ItemRegex = new Regex("@[A-Za-z]*@", RegexOptions.Compiled);
-            //if (this.Name == "Voracity")
-            //    Debug.WriteLine("catch");
+            Regex ItemRegex = new Regex("@[A-Za-z0-9*]*@", RegexOptions.Compiled);
+            if (this.Name == "Voracity")
+                Debug.WriteLine("catch");
 
             foreach (Match ItemMatch in ItemRegex.Matches(descriptionCleaned))
             {
                 var tagName = ItemMatch.Value.Replace('@', ' ').Trim();
+                string[] possibleTagNames = new string[0];
+                if(tagName.Contains('*'))
+                {
+                    possibleTagNames = tagName.Split('*');
+                    tagName = possibleTagNames[0];
+                }
                 var potentialValues = Variables.AsEnumerable().FirstOrDefault(x => tagName.Contains(x.Name)||x.Name.Contains(tagName));
                 string matchValue = "";
                 if (potentialValues != null)
@@ -145,7 +151,14 @@ namespace TFT.Search.Library.Models
                     }
                     else
                     {
-                        matchValue = potentialValues.Value[0].ToString();
+                        if (possibleTagNames.Length > 1)
+                        {
+                            var calculatedValue = potentialValues.Value[0] * Convert.ToInt32(possibleTagNames[1]);
+                            var roundedValue = Math.Round(calculatedValue??0);
+                            matchValue = roundedValue.ToString();
+                        }
+                        else
+                            matchValue = potentialValues.Value[0].ToString();
                     }
                 }
                 descriptionCleaned = descriptionCleaned.Replace(ItemMatch.Value, matchValue);
