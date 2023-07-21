@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -124,16 +125,30 @@ namespace TFT.Search.Library.Models
             var descriptionCleaned = Regex.Replace(descriptionCleanedofTags, "\\(%i:[A-Za-z]*%\\)|%[A-Za-z:]*%", "");
 
             Regex ItemRegex = new Regex("@[A-Za-z]*@", RegexOptions.Compiled);
+            //if (this.Name == "Voracity")
+            //    Debug.WriteLine("catch");
+
             foreach (Match ItemMatch in ItemRegex.Matches(descriptionCleaned))
             {
-                var potentialValues = Variables.AsEnumerable().FirstOrDefault(x => ItemMatch.Value.Contains(x.Name));
+                var tagName = ItemMatch.Value.Replace('@', ' ').Trim();
+                var potentialValues = Variables.AsEnumerable().FirstOrDefault(x => tagName.Contains(x.Name)||x.Name.Contains(tagName));
                 string matchValue = "";
                 if (potentialValues != null)
-                    potentialValues.Value.ForEach(x => {
-                        if (x != 0)
-                            matchValue += x.ToString() + "/";
-                    });
-                descriptionCleaned.Replace(ItemMatch.Value, matchValue);
+                {
+                    if (potentialValues.Value.Any(o => o != potentialValues.Value[0]))
+                    {
+                        potentialValues.Value.ForEach(x =>
+                        {
+                            if (x != 0)
+                                matchValue += x.ToString() + "/";
+                        });
+                    }
+                    else
+                    {
+                        matchValue = potentialValues.Value[0].ToString();
+                    }
+                }
+                descriptionCleaned = descriptionCleaned.Replace(ItemMatch.Value, matchValue);
             }
             Desc = descriptionCleaned;
         }
