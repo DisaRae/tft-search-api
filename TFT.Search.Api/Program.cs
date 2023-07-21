@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 //services cors
 builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 {
-    builder.WithOrigins("http://localhost:800","https://www.tft.versionverve.com").AllowAnyMethod().AllowAnyHeader();
+    builder.WithOrigins("http://localhost:1337/", "https://www.tft.versionverve.com").AllowAnyMethod().AllowAnyHeader();
 }));
 
 var app = builder.Build();
