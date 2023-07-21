@@ -34,14 +34,15 @@ namespace TFT.Search.Library.Repositories
             //return LoadJson<RawCdragon>("C:\\Users\\raeka\\OneDrive\\Desktop\\TftSearch\\TFT.Search\\raw_cdragon_tft.json");
             var result = GetJsonFile();
             if (result != null && result.SetData != null)
-                result.SetData.ForEach(x =>
+                foreach (var set in result.SetData)
                 {
-                    x.Champions.ForEach(y =>
-                    {
-                        if (y.Ability != null)
-                            y.Ability.CleanDescription();
-                    });
-                });
+                    if (set.Champions != null)
+                        foreach (var champion in set.Champions)
+                        {
+                            if (champion.Ability != null)
+                                champion.Ability.CleanDescription();
+                        }
+                }
             return result;
         }
 
