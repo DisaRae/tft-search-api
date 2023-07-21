@@ -121,7 +121,7 @@ namespace TFT.Search.Library.Models
             //  https://regex101.com/
             var newLineAdded = Regex.Replace(description, "<\\bbr\\b>", "\r\n");
             var descriptionCleanedofTags = Regex.Replace(newLineAdded, "<[A-Za-z]*>|<\\/[A-Za-z]*>", "");
-            var descriptionCleaned = Regex.Replace(descriptionCleanedofTags, "\\(%[A-Za-z:]*%\\)|%[A-Za-z:]*%", "");
+            var descriptionCleaned = Regex.Replace(descriptionCleanedofTags, "\\(%i:[A-Za-z]*%\\)|%[A-Za-z:]*%", "");
 
             Regex ItemRegex = new Regex("@[A-Za-z]*@", RegexOptions.Compiled);
             foreach (Match ItemMatch in ItemRegex.Matches(descriptionCleaned))
