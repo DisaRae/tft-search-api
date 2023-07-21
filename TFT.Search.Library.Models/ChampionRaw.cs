@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
 
@@ -77,6 +78,11 @@ namespace TFT.Search.Library.Models
 
     public class AbilityRaw: ImageBase
     {
+
+        [JsonProperty("variables")]
+        [JsonPropertyName("variables")]
+        public List<Variable> Variables { get; set; }
+
         [JsonProperty("desc")]
         [JsonPropertyName("desc")]
         public string Desc { get; set; }
@@ -100,9 +106,37 @@ namespace TFT.Search.Library.Models
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("variables")]
-        [JsonPropertyName("variables")]
-        public List<Variable> Variables { get; set; }
+        public void CleanDescription()
+        {
+            var description = Desc ?? String.Empty;
+            if (Variables == null || Variables.Count == 0 || String.IsNullOrWhiteSpace(description))
+            {
+                Desc = description;
+                return;
+            }
+            // "@[A-Za-z]*@"
+            //  "<[A-Za-z]*>|<\/[A-Za-z]*>"
+            //  "\(%[A-Za-z:]*%\)"gm
+            //  <[A-Za-z]*>^(<br>)$|<\/[A-Za-z]*>
+            //  https://regex101.com/
+            var newLineAdded = Regex.Replace(description, "<\\bbr\\b>", "\r\n");
+            var descriptionCleanedofTags = Regex.Replace(newLineAdded, "<[A-Za-z]*>|<\\/[A-Za-z]*>", "");
+            var descriptionCleaned = Regex.Replace(descriptionCleanedofTags, "\\(%[A-Za-z:]*%\\)", "");
+
+            Regex ItemRegex = new Regex("@[A-Za-z]*@", RegexOptions.Compiled);
+            foreach (Match ItemMatch in ItemRegex.Matches(descriptionCleaned))
+            {
+                var potentialValues = Variables.AsEnumerable().FirstOrDefault(x => ItemMatch.Value.Contains(x.Name));
+                string matchValue = "";
+                if (potentialValues != null)
+                    potentialValues.Value.ForEach(x => {
+                        if (x != 0)
+                            matchValue += x.ToString() + "/";
+                    });
+                description.Replace(ItemMatch.Value, matchValue);
+            }
+            Desc = description;
+        }
     }
 
     public class StatsRaw

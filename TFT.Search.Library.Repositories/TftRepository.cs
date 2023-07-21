@@ -13,31 +13,30 @@ namespace TFT.Search.Library.Repositories
 
         public TftRepository()
         {
-            TftData = GetJsonFile();
+            TftData = LoadJson();
             DataLastRetrieved = DateTime.Now;
         }
 
         public void CheckDataLastRetrievedAndRefreshIfNecessary()
         {
             if (DataLastRetrieved.AddHours(2) < DateTime.Now)
-                TftData = GetJsonFile();
+                TftData = LoadJson();
         }
 
         private RawCdragon LoadJson()
         {
             //return LoadJson<RawCdragon>("C:\\Users\\raeka\\OneDrive\\Desktop\\TftSearch\\TFT.Search\\raw_cdragon_tft.json");
-            return GetJsonFile();
-        }
-
-        private T LoadJson<T>(string path)
-        {
-            T item;
-            using (StreamReader r = new StreamReader(path))
-            {
-                string json = r.ReadToEnd();
-                item = JsonConvert.DeserializeObject<T>(json);
-            }
-            return item;
+            var result = GetJsonFile();
+            if (result != null && result.SetData != null)
+                result.SetData.ForEach(x =>
+                {
+                    x.Champions.ForEach(y =>
+                    {
+                        if (y.Ability != null)
+                            y.Ability.CleanDescription();
+                    });
+                });
+            return result;
         }
 
         private RawCdragon GetJsonFile()
