@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TFT.Search.Library.Models;
 using TFT.Search.Library.Repositories;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace TFT.Search.Api.Controllers
 {
