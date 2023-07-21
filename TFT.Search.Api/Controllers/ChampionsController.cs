@@ -26,34 +26,25 @@ namespace TFT.Search.Api.Controllers
         [HttpGet, Route("champions")]
         public IEnumerable<ChampionRaw>? Champions()
         {
-            var dataset = _repository.TftData;
-            if (dataset == null)
-                throw new Exception("Unable to retrieve TFT data at this time");
-            var orderedSetData = dataset.SetData?.OrderByDescending(x => x.Id);
-            var currentSet = orderedSetData?.FirstOrDefault();
-            return currentSet?.Champions;
+            return _repository.CurrentSet?.Champions;
         }
 
         [HttpGet,Route("champions/{name}")]
-        public IEnumerable<ChampionRaw>? Champions(string name)
+        public IEnumerable<ChampionRaw> Champions(string name)
         {
-            var dataset = _repository.TftData;
-            if (dataset == null)
+            var currentSetChampions = _repository.CurrentSet?.Champions;
+            if (_repository.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
-            var orderedSetData = dataset.SetData?.OrderByDescending(x => x.Id);
-            var currentSetChampions = orderedSetData?.FirstOrDefault().Champions;
             var foundChampions = currentSetChampions.Where(x => (x.Name ?? String.Empty).ToLower() == name.ToLower());
             return foundChampions;
         }
 
         [HttpGet, Route("champions/search/skills/{keyword}")]
-        public IEnumerable<ChampionRaw>? SearchChampionSkills(string keyword)
+        public IEnumerable<ChampionRaw> SearchChampionSkills(string keyword)
         {
-            var dataset = _repository.TftData;
-            if (dataset == null)
+            var currentSetChampions = _repository.CurrentSet?.Champions;
+            if (_repository.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
-            var orderedSetData = dataset.SetData?.OrderByDescending(x => x.Id);
-            var currentSetChampions = orderedSetData?.FirstOrDefault()?.Champions;
             var foundChampions = currentSetChampions.Where(x => (x.Ability?.Desc ?? String.Empty).ToLower().Contains(keyword.ToLower()));
             return foundChampions;
         }

@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Linq;
 using TFT.Search.Library.Models;
 
 namespace TFT.Search.Library.Repositories
@@ -9,18 +10,23 @@ namespace TFT.Search.Library.Repositories
     public class TftRepository
     {
         public RawCdragon TftData { get; set; }
+        public Set CurrentSet { get; set; }
         public DateTime DataLastRetrieved { get; set; }
 
         public TftRepository()
         {
             TftData = LoadJson();
+            CurrentSet = LoadCurrentSet();
             DataLastRetrieved = DateTime.Now;
         }
 
         public void CheckDataLastRetrievedAndRefreshIfNecessary()
         {
             if (DataLastRetrieved.AddHours(2) < DateTime.Now)
+            {
                 TftData = LoadJson();
+                CurrentSet = LoadCurrentSet();
+            }
         }
 
         private RawCdragon LoadJson()
@@ -37,6 +43,14 @@ namespace TFT.Search.Library.Repositories
                     });
                 });
             return result;
+        }
+
+        private Set LoadCurrentSet()
+        {
+            if (TftData == null)
+                return null;
+            var orderedSetData = TftData.SetData?.OrderByDescending(x => x.Id);
+            return orderedSetData?.FirstOrDefault();
         }
 
         private RawCdragon GetJsonFile()
