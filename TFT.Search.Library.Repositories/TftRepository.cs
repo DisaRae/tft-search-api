@@ -12,17 +12,17 @@ namespace TFT.Search.Library.Repositories
     {
         public RawCdragon TftData { get; set; }
         public Set CurrentSet { get; set; }
-        public DateTime DataLastRetrieved { get; set; }
+        public DateTime? DataLastRetrieved { get; set; }
 
         public TftRepository()
         {
-            DataLastRetrieved = DateTime.Now;
             CheckDataLastRetrievedAndRefreshIfNecessary();
+            DataLastRetrieved = DateTime.Now.AddMinutes(-5);
         }
 
         public void CheckDataLastRetrievedAndRefreshIfNecessary()
         {
-            if (DataLastRetrieved.AddHours(2) < DateTime.Now)
+            if ((DataLastRetrieved??DateTime.MinValue).AddHours(2) < DateTime.Now)
             {
                 TftData = LoadJson();
                 var rawCurrentSet = LoadCurrentSet();
