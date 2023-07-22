@@ -24,7 +24,7 @@ namespace TFT.Search.Api.Controllers
 
 
         [HttpGet, Route("")]
-        public Set? Get()
+        public SetRaw Get()
         {
             var dataset = _repository.TftData;
             if (dataset == null)
@@ -35,7 +35,7 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet, Route("traits")]
-        public IEnumerable<Traits>? Traits()
+        public IEnumerable<Traits> Traits()
         {
             var dataset = _repository.TftData;
             if (dataset == null)

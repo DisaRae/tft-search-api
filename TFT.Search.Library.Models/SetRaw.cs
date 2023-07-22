@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TFT.Search.Library.Models
 {
-    public class Set
+    public class SetRaw
     {
         [JsonProperty("number")]
         [JsonPropertyName("number")]
@@ -17,8 +17,11 @@ namespace TFT.Search.Library.Models
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
+        [JsonPropertyName("mutator")]
+        public string Mutator { get; set; }
+
         [JsonPropertyName("champions")]
-        public List<Champion> Champions { get; set; }
+        public List<ChampionRaw> Champions { get; set; }
 
         [JsonPropertyName("traits")]
         public List<Traits> Traits { get; set; }

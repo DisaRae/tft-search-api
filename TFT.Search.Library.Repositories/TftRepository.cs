@@ -1,6 +1,7 @@
 ﻿using Flurl.Http;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TFT.Search.Library.Models;
@@ -15,9 +16,8 @@ namespace TFT.Search.Library.Repositories
 
         public TftRepository()
         {
-            TftData = LoadJson();
-            CurrentSet = LoadCurrentSet();
             DataLastRetrieved = DateTime.Now;
+            CheckDataLastRetrievedAndRefreshIfNecessary();
         }
 
         public void CheckDataLastRetrievedAndRefreshIfNecessary()
@@ -25,7 +25,8 @@ namespace TFT.Search.Library.Repositories
             if (DataLastRetrieved.AddHours(2) < DateTime.Now)
             {
                 TftData = LoadJson();
-                CurrentSet = LoadCurrentSet();
+                var rawCurrentSet = LoadCurrentSet();
+                CurrentSet = CleanRawSet(rawCurrentSet);
             }
         }
 
@@ -46,7 +47,7 @@ namespace TFT.Search.Library.Repositories
             return result;
         }
 
-        private Set LoadCurrentSet()
+        private SetRaw LoadCurrentSet()
         {
             if (TftData == null)
                 return null;
@@ -63,6 +64,15 @@ namespace TFT.Search.Library.Repositories
 
             var result = request.GetAwaiter().GetResult();
             return result;
+        }
+
+        private Set CleanRawSet(SetRaw startingSet)
+        {
+            if (TftData == null)
+                return null;
+            string json = JsonConvert.SerializeObject(startingSet);
+            var endSet = JsonConvert.DeserializeObject<Set>(json);
+            return endSet;
         }
     }
 }

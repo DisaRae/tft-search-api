@@ -8,6 +8,6 @@ namespace TFT.Search.Library.Models
     public class RawCdragon
     {
         public List<object> Items { get; set; }
-        public List<Set> SetData { get; set; }
+        public List<SetRaw> SetData { get; set; }
     }
 }

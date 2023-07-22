@@ -12,7 +12,7 @@ using static System.Net.WebRequestMethods;
 
 namespace TFT.Search.Library.Models
 {
-    public class ChampionRaw: Champion
+    public class ChampionRaw: ImageBase
     {
         [JsonProperty("ability")]
         [JsonPropertyName("ability")]

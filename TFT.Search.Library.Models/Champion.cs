@@ -10,7 +10,7 @@ using static System.Net.WebRequestMethods;
 
 namespace TFT.Search.Library.Models
 {
-    public class Champion: ImageBase
+    public class Champion
     {
         [JsonProperty("ability")]
         [JsonPropertyName("ability")]
@@ -26,18 +26,7 @@ namespace TFT.Search.Library.Models
 
         [JsonProperty("squareIcon")]
         [JsonPropertyName("squareIcon")]
-        public string SquareIcon
-        {
-            get 
-            { 
-                return _imageBaseUrl + _squareIcon.ToLower() ?? String.Empty; 
-            }
-            set
-            {
-                _squareIcon = value;
-            }
-        }
-        public string _squareIcon;
+        public string Icon { get; set; }
 
         [JsonProperty("stats")]
         [JsonPropertyName("stats")]
@@ -52,30 +41,15 @@ namespace TFT.Search.Library.Models
     {
         [JsonProperty("desc")]
         [JsonPropertyName("desc")]
-        public string Desc { get; set; }
+        public string Description { get; set; }
 
         [JsonProperty("icon")]
         [JsonPropertyName("icon")]
-        public string Icon
-        {
-            get
-            {
-                return _imageBaseUrl + _icon.ToLower() ?? String.Empty;
-            }
-            set
-            {
-                _icon = value;
-            }
-        }
-        private string _icon;
+        public string Icon { get; set; }
 
         [JsonProperty("name")]
         [JsonPropertyName("name")]
         public string Name { get; set; }
-
-        [JsonProperty("variables")]
-        [JsonPropertyName("variables")]
-        public List<Variable> Variables { get; set; }
     }
 
     public class Stats
