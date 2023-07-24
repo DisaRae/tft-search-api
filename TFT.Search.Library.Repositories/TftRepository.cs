@@ -72,6 +72,8 @@ namespace TFT.Search.Library.Repositories
                 return null;
             string json = JsonConvert.SerializeObject(startingSet);
             var endSet = JsonConvert.DeserializeObject<Set>(json);
+            if (endSet != null && endSet?.Champions != null)
+                endSet.Champions = endSet.Champions.Where(x => x.Traits != null && x.Traits.Any()).ToList();
             return endSet;
         }
     }
