@@ -154,7 +154,7 @@ namespace TFT.Search.Library.Models
                                     matchValue += x.ToString() + "%/";
                                 }
                                 else
-                                    matchValue += x.ToString() + "/";
+                                    matchValue += Math.Round(x??0, 2).ToString() + "/";
                             }
                         });
                     }
@@ -174,7 +174,7 @@ namespace TFT.Search.Library.Models
                                 matchValue = potentialValues.Value[0].ToString() + "%";
                             }
                             else
-                                matchValue = potentialValues.Value[0].ToString();
+                                matchValue = Math.Round(potentialValues.Value[0]??0, 2).ToString();
                         }
                     }
                 }
