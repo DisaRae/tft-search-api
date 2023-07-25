@@ -34,8 +34,9 @@ namespace TFT.Search.Library.Models
         [JsonPropertyName("icon")]
         public string Icon
         { 
-            get 
-            { 
+            get
+            {
+                var replacedImageType = (_icon ?? String.Empty).Replace(".tex", ".png");
                 return _imageBaseUrl + (_icon??String.Empty).ToLower() ?? String.Empty; 
             } 
             set 
