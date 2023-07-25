@@ -8,6 +8,6 @@ namespace TFT.Search.Library.Models
 {
     public class ImageBase
     {
-        internal string _imageBaseUrl = "https://raw.communitydragon.org/13.13/game";
+        internal string _imageBaseUrl = "https://raw.communitydragon.org/13.13/game/";
     }
 }

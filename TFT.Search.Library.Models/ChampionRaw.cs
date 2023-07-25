@@ -94,7 +94,8 @@ namespace TFT.Search.Library.Models
         {
             get
             {
-                return _imageBaseUrl + (_icon ?? String.Empty).ToLower() ?? String.Empty;
+                var replacedImageType = (_icon ?? String.Empty).Replace(".dds", ".png");
+                return _imageBaseUrl + replacedImageType.ToLower() ?? String.Empty;
             }
             set
             {
