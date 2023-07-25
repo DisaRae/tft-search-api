@@ -125,8 +125,8 @@ namespace TFT.Search.Library.Models
             var descriptionCleaned = Regex.Replace(descriptionCleanedofTags, "\\(%i:[A-Za-z]*%\\)|%[A-Za-z:]*%", "");
 
             Regex ItemRegex = new Regex("@[A-Za-z0-9*]*@", RegexOptions.Compiled);
-            if (this.Name == "Voracity")
-                Debug.WriteLine("catch");
+            //if (this.Name == "Voracity")
+            //    Debug.WriteLine("catch");
 
             foreach (Match ItemMatch in ItemRegex.Matches(descriptionCleaned))
             {
@@ -146,7 +146,16 @@ namespace TFT.Search.Library.Models
                         potentialValues.Value.ForEach(x =>
                         {
                             if (x != 0)
-                                matchValue += x.ToString() + "/";
+                            {
+
+                                if (x < 1)
+                                {
+                                    x = Math.Round(x ?? 0, 2) * 100;
+                                    matchValue += x.ToString() + "%/";
+                                }
+                                else
+                                    matchValue += x.ToString() + "/";
+                            }
                         });
                     }
                     else
@@ -154,11 +163,19 @@ namespace TFT.Search.Library.Models
                         if (possibleTagNames.Length > 1)
                         {
                             var calculatedValue = potentialValues.Value[0] * Convert.ToInt32(possibleTagNames[1]);
-                            var roundedValue = Math.Round(calculatedValue??0);
+                            var roundedValue = Math.Round(calculatedValue ?? 0);
                             matchValue = roundedValue.ToString();
                         }
                         else
-                            matchValue = potentialValues.Value[0].ToString();
+                        {
+                            if (potentialValues.Value[0] < 1)
+                            {
+                                potentialValues.Value[0] = Math.Round(potentialValues.Value[0] ?? 0, 2) * 100;
+                                matchValue = potentialValues.Value[0].ToString() + "%";
+                            }
+                            else
+                                matchValue = potentialValues.Value[0].ToString();
+                        }
                     }
                 }
                 descriptionCleaned = descriptionCleaned.Replace(ItemMatch.Value, matchValue);
