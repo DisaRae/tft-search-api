@@ -37,7 +37,7 @@ namespace TFT.Search.Library.Models
             get
             {
                 var replacedImageType = (_icon ?? String.Empty).Replace(".tex", ".png");
-                return _imageBaseUrl + (_icon??String.Empty).ToLower() ?? String.Empty; 
+                return _imageBaseUrl + replacedImageType.ToLower() ?? String.Empty; 
             } 
             set 
             { 
@@ -54,9 +54,10 @@ namespace TFT.Search.Library.Models
         [JsonPropertyName("squareIcon")]
         public string SquareIcon
         {
-            get 
-            { 
-                return _imageBaseUrl + (_squareIcon??String.Empty).ToLower() ?? String.Empty; 
+            get
+            {
+                var replacedImageType = (_squareIcon ?? String.Empty).Replace(".tex", ".png");
+                return _imageBaseUrl + replacedImageType.ToLower() ?? String.Empty;
             }
             set
             {
