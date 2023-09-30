@@ -12,6 +12,8 @@ namespace TFT.Search.Library.Repositories
     {
         public RawCdragon TftData { get; set; }
         public Set CurrentSet { get; set; }
+        public IEnumerable<Item> Items { get; set; }
+        public IEnumerable<Augment> Augments { get; set; }
         public DateTime? DataLastRetrieved { get; set; }
 
         public TftRepository()
@@ -26,6 +28,9 @@ namespace TFT.Search.Library.Repositories
             {
                 TftData = LoadJson();
                 var rawCurrentSet = LoadCurrentSet();
+                var rawItems = LoadItemsAndAugments();
+                Items = rawItems.Item1;
+                Augments = rawItems.Item2;
                 CurrentSet = CleanRawSet(rawCurrentSet);
             }
         }
@@ -53,6 +58,31 @@ namespace TFT.Search.Library.Repositories
                 return null;
             var orderedSetData = TftData.SetData?.OrderByDescending(x => x.Id);
             return orderedSetData?.FirstOrDefault();
+        }
+
+        private (IEnumerable<Item>, IEnumerable<Augment>) LoadItemsAndAugments()
+        {
+            if (TftData == null)
+                return (null, null);
+            var orderedSetData = TftData.Items;
+            var itemList = new List<Item>();
+            var augmentList = new List<Augment>();
+            foreach (var item in orderedSetData)
+            {
+                if (item.ApiName.ToLower().Contains("augment"))
+                {
+                    string json = JsonConvert.SerializeObject(item);
+                    var endAugment = JsonConvert.DeserializeObject<Augment>(json);
+                    augmentList.Add(endAugment);
+                }
+                else
+                {
+                    string json = JsonConvert.SerializeObject(item);
+                    var endItem = JsonConvert.DeserializeObject<Item>(json);
+                    itemList.Add(endItem);
+                }
+            }
+            return (itemList, augmentList);
         }
 
         private RawCdragon GetJsonFile()
