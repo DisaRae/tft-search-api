@@ -29,7 +29,7 @@ namespace TFT.Search.Library.Models
 
         [JsonProperty("effects")]
         [JsonPropertyName("effects")]
-        public List<KeyValuePair<string, string>> Effects { get; set; }
+        public object Effects { get; set; }
 
         [JsonProperty("from")]
         [JsonPropertyName("from")]

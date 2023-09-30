@@ -24,11 +24,11 @@ namespace TFT.Search.Library.Models
 
         [JsonProperty("desc")]
         [JsonPropertyName("desc")]
-        public string Desc { get; set; }
+        public string Description { get; set; }
 
         [JsonProperty("effects")]
         [JsonPropertyName("effects")]
-        public List<KeyValuePair<string, string>> Effects { get; set; }
+        public object Effects { get; set; }
 
         [JsonProperty("from")]
         [JsonPropertyName("from")]

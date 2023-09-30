@@ -14,6 +14,7 @@ namespace TFT.Search.Library.Repositories
         public Set CurrentSet { get; set; }
         public IEnumerable<Item> Items { get; set; }
         public IEnumerable<Augment> Augments { get; set; }
+        public int CurrentSetNumber { get; set; }
         public DateTime? DataLastRetrieved { get; set; }
 
         public TftRepository()
@@ -57,7 +58,9 @@ namespace TFT.Search.Library.Repositories
             if (TftData == null)
                 return null;
             var orderedSetData = TftData.SetData?.OrderByDescending(x => x.Id);
-            return orderedSetData?.FirstOrDefault();
+            var currentSet = orderedSetData?.FirstOrDefault();
+            CurrentSetNumber = currentSet.Id;
+            return currentSet;
         }
 
         private (IEnumerable<Item>, IEnumerable<Augment>) LoadItemsAndAugments()
@@ -69,17 +72,20 @@ namespace TFT.Search.Library.Repositories
             var augmentList = new List<Augment>();
             foreach (var item in orderedSetData)
             {
-                if (item.ApiName.ToLower().Contains("augment"))
+                if (item.ApiName.Contains($"TFT{CurrentSetNumber}"))
                 {
-                    string json = JsonConvert.SerializeObject(item);
-                    var endAugment = JsonConvert.DeserializeObject<Augment>(json);
-                    augmentList.Add(endAugment);
-                }
-                else
-                {
-                    string json = JsonConvert.SerializeObject(item);
-                    var endItem = JsonConvert.DeserializeObject<Item>(json);
-                    itemList.Add(endItem);
+                    if (item.ApiName.ToLower().Contains("augment"))
+                    {
+                        string json = JsonConvert.SerializeObject(item);
+                        var endAugment = JsonConvert.DeserializeObject<Augment>(json);
+                        augmentList.Add(endAugment);
+                    }
+                    else
+                    {
+                        string json = JsonConvert.SerializeObject(item);
+                        var endItem = JsonConvert.DeserializeObject<Item>(json);
+                        itemList.Add(endItem);
+                    }
                 }
             }
             return (itemList, augmentList);

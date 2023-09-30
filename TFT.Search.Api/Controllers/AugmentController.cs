@@ -25,13 +25,13 @@ namespace TFT.Search.Api.Controllers
             _repository.CheckDataLastRetrievedAndRefreshIfNecessary();
         }
 
-        [HttpGet, Route("augment")]
+        [HttpGet, Route("augments")]
         public IEnumerable<Augment> Augments()
         {
             return _repository.Augments;
         }
 
-        [HttpGet, Route("items/{name}")]
+        [HttpGet, Route("augments/{name}")]
         public IEnumerable<Augment> Augments(string name)
         {
             var currentSetItems = _repository.Augments;
@@ -42,7 +42,7 @@ namespace TFT.Search.Api.Controllers
             return foundItems;
         }
 
-        [HttpGet, Route("items/search/description/{keyword}")]
+        [HttpGet, Route("augments/search/description/{keyword}")]
         public IEnumerable<Augment> SearchAugmentDescripttion(string keyword)
         {
             var currentSetItems = _repository.Augments;
