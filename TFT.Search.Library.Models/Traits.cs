@@ -13,6 +13,15 @@ namespace TFT.Search.Library.Models
         public string Name { get; set; }
 
         [JsonPropertyName("desc")]
-        public string Description { get; set; }
+        public string Desc { get; set; }
+
+        [JsonPropertyName("apiName")]
+        public string ApiName { get; set; }
+
+        [JsonPropertyName("icon")]
+        public string Icon { get; set; }
+
+        [JsonPropertyName("effects")]
+        public List<dynamic> Effects { get; set; }
     }
 }
