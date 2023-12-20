@@ -11,50 +11,7 @@ namespace TFT.Search.Library.Models
 {
     public class Augment: ItemRaw
     {
-        [JsonProperty("apiName")]
-        [JsonPropertyName("apiName")]
-        public string ApiName { get; set; }
 
-        [JsonProperty("associatedTraits")]
-        [JsonPropertyName("associatedTraits")]
-        public List<object> AssociatedTraits { get; set; }
-
-        [JsonProperty("composition")]
-        [JsonPropertyName("composition")]
-        public List<object> Composition { get; set; }
-
-        [JsonProperty("desc")]
-        [JsonPropertyName("desc")]
-        public string Description { get; set; }
-
-
-        [JsonProperty("effects")]
-        [JsonPropertyName("effects")]
-        public object Effects { get; set; }
-
-        [JsonProperty("from")]
-        [JsonPropertyName("from")]
-        public object From { get; set; }
-
-        [JsonProperty("icon")]
-        [JsonPropertyName("icon")]
-        public string Icon { get; set; }
-
-        [JsonProperty("id")]
-        [JsonPropertyName("id")]
-        public object Id { get; set; }
-
-        [JsonProperty("incompatibleTraits")]
-        [JsonPropertyName("incompatibleTraits")]
-        public List<object> IncompatibleTraits { get; set; }
-
-        [JsonProperty("name")]
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("unique")]
-        [JsonPropertyName("unique")]
-        public bool Unique { get; set; }
     }
 
 

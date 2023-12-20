@@ -8,14 +8,12 @@ using System.Threading.Tasks;
 
 namespace TFT.Search.Library.Models.RawData
 {
-    public class Variable
+    public class VariableRaw
     {
         [JsonProperty("name")]
-        [JsonPropertyName("name")]
         public string Name { get; set; }
 
         [JsonProperty("value")]
-        [JsonPropertyName("value")]
         public List<double?> Value { get; set; }
     }
 }

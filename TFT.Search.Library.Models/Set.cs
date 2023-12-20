@@ -3,24 +3,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace TFT.Search.Library.Models
 {
     public class Set
     {
         [JsonProperty("number")]
-        [JsonPropertyName("number")]
         public int Id { get; set; }
 
-        [JsonPropertyName("name")]
+        [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonPropertyName("champions")]
-        public List<Champion> Champions { get; set; }
+        [JsonProperty("champions")]
+        public IEnumerable<Champion> Champions { get; set; }
 
-        [JsonPropertyName("traits")]
-        public List<Traits> Traits { get; set; }
+        [JsonProperty("traits")]
+        public IEnumerable<TraitsRaw> Traits { get; set; }
+
+        [JsonProperty("items")]
+        public IEnumerable<Item> Items { get; set; }
+
+        [JsonProperty("augments")]
+        public IEnumerable<Augment> Augments { get; set; }
     }
 }
