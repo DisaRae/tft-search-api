@@ -9,7 +9,8 @@ namespace TestProject
         public void Test1()
         {
             var repo = new TftRepository();
-            var currentSet = repo.TftData.SetData.AsEnumerable().FirstOrDefault(x => x.Id == 9);
+            var data = repo.GetJsonFile();
+            var currentSet = data.SetData.AsEnumerable().FirstOrDefault(x => x.Id == 9);
             Assert.NotNull(currentSet);
             var currentChampions = currentSet?.Champions;
             Assert.NotNull(currentChampions);

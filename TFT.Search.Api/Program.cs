@@ -6,7 +6,9 @@ using TFT.Search.Library.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 // Add services to the container.
-builder.Services.AddSingleton<TftRepository>();
+builder.Services.AddSingleton<ITftRepository, TftRepository>();
+builder.Services.AddSingleton<ITftService, TftService>();
+builder.Services.AddSingleton<TftDataBuilder>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

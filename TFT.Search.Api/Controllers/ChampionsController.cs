@@ -9,44 +9,44 @@ using TFT.Search.Library.Repositories;
 namespace TFT.Search.Api.Controllers
 {
     [ApiController]
-    [Route("currentset")]
+    [Route("set/current/champions")]
     public class ChampionsController : Controller
     {
-        private readonly TftRepository _repository;
+        private readonly TftDataBuilder _builder;
         private const string _key = "53567bbe-4d5f-4513-8595-3d9417839f93";
 
         //private readonly ILogger _logger;
 
-        public ChampionsController(TftRepository repository)
+        public ChampionsController(TftDataBuilder builder)
         {
             //_logger = logger;
-            _repository = repository;
-            _repository.CheckDataLastRetrievedAndRefreshIfNecessary();
+            _builder = builder;
+            _builder.CheckDataLastRetrievedAndRefreshIfNecessary();
         }
 
-        [HttpGet, Route("champions")]
+        [HttpGet, Route("")]
         public IEnumerable<Champion> Champions()
         {
-            return _repository.CurrentSet?.Champions;
+            return _builder.CurrentSet?.Champions;
         }
 
-        [HttpGet, Route("champions/{name}")]
+        [HttpGet, Route("{name}")]
         public IEnumerable<Champion> Champions(string name)
         {
-            var currentSetChampions = _repository.CurrentSet?.Champions;
-            if (_repository.CurrentSet?.Champions == null)
+            var currentSetChampions = _builder.CurrentSet?.Champions;
+            if (_builder.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
             var foundChampions = currentSetChampions.Where(x => (x.Name ?? String.Empty).ToLower() == name.ToLower());
             return foundChampions;
         }
 
-        [HttpGet, Route("champions/search/skills/{keyword}")]
+        [HttpGet, Route("skills/{keyword}")]
         public IEnumerable<Champion> SearchChampionSkills(string keyword)
         {
-            var currentSetChampions = _repository.CurrentSet?.Champions;
-            if (_repository.CurrentSet?.Champions == null)
+            var currentSetChampions = _builder.CurrentSet?.Champions;
+            if (_builder.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
-            var foundChampions = currentSetChampions.Where(x => (x.Ability?.Description ?? String.Empty).ToLower().Contains(keyword.ToLower()));
+            var foundChampions = currentSetChampions.Where(x => (x.Ability?.Desc ?? String.Empty).ToLower().Contains(keyword.ToLower()));
             return foundChampions;
         }
     }
