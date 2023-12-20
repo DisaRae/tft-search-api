@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TFT.Search.Library.Models;
+using TFT.Search.Library.Models.RawData;
 
 namespace TFT.Search.Library.Repositories
 {
@@ -49,6 +50,10 @@ namespace TFT.Search.Library.Repositories
                             if (champion.Ability != null)
                                 champion.Ability.CleanDescription();
                         }
+
+                    if (set.Traits != null)
+                        foreach (var trait in set.Traits)
+                            trait.ScrubHtmlTags();
                 }
             return result;
         }
@@ -95,8 +100,7 @@ namespace TFT.Search.Library.Repositories
         {
             var url = "https://raw.communitydragon.org/latest/cdragon/tft/en_us.json";
 
-            var request = url.
-                GetJsonAsync<RawCdragon>();
+            var request = url.GetJsonAsync<RawCdragon>();
 
             var result = request.GetAwaiter().GetResult();
             return result;

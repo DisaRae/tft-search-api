@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TFT.Search.Library.Models;
+using TFT.Search.Library.Models.RawData;
 using TFT.Search.Library.Repositories;
 
 namespace TFT.Search.Api.Controllers

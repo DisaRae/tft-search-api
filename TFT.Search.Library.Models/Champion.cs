@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using TFT.Search.Library.Models.RawData;
 using static System.Net.WebRequestMethods;
 
 namespace TFT.Search.Library.Models
@@ -37,7 +38,7 @@ namespace TFT.Search.Library.Models
         public List<string> Traits { get; set; }
     }
 
-    public class Ability: ImageBase
+    public class Ability: RawDataBase
     {
         [JsonProperty("desc")]
         [JsonPropertyName("desc")]

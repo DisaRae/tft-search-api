@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace TFT.Search.Library.Models 
+namespace TFT.Search.Library.Models.RawData
 {
     /// <summary>
     /// https://raw.communitydragon.org/latest/cdragon/tft/en_us.json
