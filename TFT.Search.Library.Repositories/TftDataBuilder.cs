@@ -28,6 +28,7 @@ namespace TFT.Search.Library.Repositories
         {
             if ((DataLastRetrieved ?? DateTime.MinValue).AddHours(2) < DateTime.Now)
             {
+                _tftService.RefreshData();
                 CurrentSetId = _tftService.GetCurrentSetId() ?? 0;
                 AllSets = _tftService.GetSets();
                 CurrentSet = _tftService.GetSet(CurrentSetId);

@@ -13,7 +13,8 @@ namespace TFT.Search.Library.Repositories
     {
         int? GetCurrentSetId();
         IEnumerable<Set> GetSets();
-        Set GetSet(int setId);  
+        Set GetSet(int setId); 
+        void RefreshData();
     }
     public class TftService: ITftService
     {
@@ -33,6 +34,12 @@ namespace TFT.Search.Library.Repositories
             //return LoadJson<RawCdragon>("C:\\Users\\raeka\\OneDrive\\Desktop\\TftSearch\\TFT.Search\\raw_cdragon_tft.json");
             var result = _tftRepository.GetJsonFile();
             return result;
+        }
+
+        public void RefreshData()
+        {
+            _tftData = LoadRawData();
+            _sets = CleanRawData();
         }
 
         public int? GetCurrentSetId()
@@ -63,23 +70,38 @@ namespace TFT.Search.Library.Repositories
 
             _tftData.SetData.ForEach(rawSet =>
             {
-                //  Scrubbing text description
-                if (rawSet.Champions != null)
-                    foreach (var champion in rawSet.Champions)
+                Task cleanChampionsAndTraits = Task.Factory.StartNew(() =>
+                {
+                    var formatChampionDescription = Task.Factory.StartNew(() =>
                     {
-                        if (champion.Ability != null)
-                            champion.Ability.FormatDescription();
-                    }
+                        //  Scrubbing text description
+                        if (rawSet.Champions != null)
+                            foreach (var champion in rawSet.Champions)
+                            {
+                                if (champion.Ability != null)
+                                    champion.Ability.FormatDescription();
+                            }
+                    }, TaskCreationOptions.AttachedToParent);
 
-                if (rawSet.Traits != null)
-                    foreach (var trait in rawSet.Traits)
-                        trait.ScrubHtmlTags();
+                    var formatTraits = Task.Factory.StartNew(() =>
+                    {
+                        if (rawSet.Traits != null)
+                            foreach (var trait in rawSet.Traits)
+                                trait.ScrubHtmlTags();
+                    }, TaskCreationOptions.AttachedToParent); 
+                });
 
-                var set = CleanRawSet(rawSet);
-                var itemsAndAugments = GetItemsAndAugments(rawSet.Id);
-                set.Items = itemsAndAugments.Item1;
-                set.Augments = itemsAndAugments.Item2;
-                result.Add(set);
+                Set set = null;
+                cleanChampionsAndTraits.ContinueWith(x =>
+                {
+                    set = CleanRawSet(rawSet);
+                    var itemsAndAugments = GetItemsAndAugments(rawSet.Id);
+                    set.Items = itemsAndAugments.Item1;
+                    set.Augments = itemsAndAugments.Item2;
+                    result.Add(set);
+                });
+
+                cleanChampionsAndTraits.Wait();
             });
             return result;
         }
