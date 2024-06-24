@@ -19,7 +19,19 @@ namespace TFT.Search.Library.Models
         public string ApiName { get; set; }
 
         [JsonPropertyName("icon")]
-        public string Icon { get; set; }
+        public string Icon
+        {
+            get
+            {
+                var replacedImageType = (_icon ?? string.Empty).Replace(".tex", ".png");
+                return _imageBaseUrl + replacedImageType.ToLower() ?? string.Empty;
+            }
+            set
+            {
+                _icon = value;
+            }
+        }
+        private string _icon;
 
         [JsonPropertyName("effects")]
         public List<Effects> Effects { get; set; }
