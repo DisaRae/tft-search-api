@@ -28,7 +28,8 @@ namespace TFT.Search.Library.Models.RawData
             var newLineAdded = Regex.Replace(description, "<\\bbr\\b>", "\r\n");
             var descriptionCleanedofTags = Regex.Replace(newLineAdded, "<[A-Za-z]*>|<\\/[A-Za-z]*>", "");
             var descriptionCleaned = Regex.Replace(descriptionCleanedofTags, "\\(%i:[A-Za-z]*%\\)|%[A-Za-z:]*%", "");
-            Desc = descriptionCleaned;
+            var spacesConverted = descriptionCleaned.Replace("&nbsp;", " ");
+            Desc = spacesConverted;
         }
     }
 }

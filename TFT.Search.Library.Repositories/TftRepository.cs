@@ -20,10 +20,12 @@ namespace TFT.Search.Library.Repositories
         {
             var url = "https://raw.communitydragon.org/latest/cdragon/tft/en_us.json";
 
-            var request = url.GetJsonAsync<RawCdragon>();
+            var request = url.GetJsonAsync();
 
             var result = request.GetAwaiter().GetResult();
-            return result;
+            var stringResult = JsonConvert.SerializeObject(result);
+            var json = JsonConvert.DeserializeObject<RawCdragon>(stringResult);
+            return json;
         }
     }
 }

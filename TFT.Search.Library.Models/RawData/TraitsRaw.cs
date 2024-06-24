@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TFT.Search.Library.Models.RawData;
 
 namespace TFT.Search.Library.Models
 {
-    public class TraitsRaw: RawDataBase
+    public class TraitsRaw : RawDataBase
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -21,7 +22,8 @@ namespace TFT.Search.Library.Models
         public string Icon { get; set; }
 
         [JsonPropertyName("effects")]
-        public List<object> Effects { get; set; }
+        public List<Effects> Effects { get; set; }
+
     }
 
     public class Effects
@@ -37,6 +39,16 @@ namespace TFT.Search.Library.Models
         public int Style { get; set; }
 
         [JsonProperty("variables")]
-        public List<VariableRaw> Variables { get; set; }
+        public object VariablesRaw { get; set; }
+
+        public Dictionary<string, dynamic> Variables
+        {
+            get {
+                var stringVariables = VariablesRaw.ToString();
+                //var removeBrackets = stringVariables.Substring(1, stringVariables.Length - 2);
+                Dictionary<string, dynamic> variables = JsonConvert.DeserializeObject<Dictionary<string,dynamic>>(stringVariables);
+                return variables;
+            }
+        }
     }
 }
