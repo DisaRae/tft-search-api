@@ -18,7 +18,7 @@ namespace TFT.Search.Library.Models
         public IEnumerable<Champion> Champions { get; set; }
 
         [JsonProperty("traits")]
-        public IEnumerable<TraitsRaw> Traits { get; set; }
+        public IEnumerable<Traits> Traits { get; set; }
 
         [JsonProperty("items")]
         public IEnumerable<Item> Items { get; set; }

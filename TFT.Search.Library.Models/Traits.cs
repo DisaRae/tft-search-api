@@ -9,7 +9,7 @@ using TFT.Search.Library.Models.RawData;
 
 namespace TFT.Search.Library.Models
 {
-    public class Traits: RawDataBase
+    public class Traits
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
@@ -22,5 +22,7 @@ namespace TFT.Search.Library.Models
 
         [JsonProperty("desc")]
         public string Description { get; set; }
+
+        public string UnitScale { get; set; }
     }
 }

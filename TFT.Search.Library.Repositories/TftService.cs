@@ -70,38 +70,40 @@ namespace TFT.Search.Library.Repositories
 
             _tftData.SetData.ForEach(rawSet =>
             {
-                Task cleanChampionsAndTraits = Task.Factory.StartNew(() =>
-                {
-                    var formatChampionDescription = Task.Factory.StartNew(() =>
-                    {
-                        //  Scrubbing text description
-                        if (rawSet.Champions != null)
-                            foreach (var champion in rawSet.Champions)
-                            {
-                                if (champion.Ability != null)
-                                    champion.Ability.FormatDescription();
-                            }
-                    }, TaskCreationOptions.AttachedToParent);
+                Set set = null;
+                object lockObject = new object();
 
-                    var formatTraits = Task.Factory.StartNew(() =>
-                    {
-                        if (rawSet.Traits != null)
-                            foreach (var trait in rawSet.Traits)
-                                trait.ScrubHtmlTags();
-                    }, TaskCreationOptions.AttachedToParent); 
+                Task cleanChampions = Task.Factory.StartNew(() =>
+                {
+                    //  Scrubbing text description
+                    if (rawSet.Champions != null)
+                        foreach (var champion in rawSet.Champions)
+                        {
+                            if (champion.Ability != null)
+                                champion.Ability.FormatDescription();
+                        }
+
                 });
 
-                Set set = null;
-                cleanChampionsAndTraits.ContinueWith(x =>
+                cleanChampions.ContinueWith(x =>
                 {
                     set = CleanRawSet(rawSet);
                     var itemsAndAugments = GetItemsAndAugments(rawSet.Id);
                     set.Items = itemsAndAugments.Item1;
                     set.Augments = itemsAndAugments.Item2;
+                });
+
+                cleanChampions.ContinueWith(x =>
+                {
+                    var traits = new List<Traits>();
+                    if (rawSet.Traits != null)
+                        foreach (var trait in rawSet.Traits)
+                             traits.Add(trait.CleanTraits());
+                    set.Traits = traits;
                     result.Add(set);
                 });
 
-                cleanChampionsAndTraits.Wait();
+                cleanChampions.Wait();
             });
             return result;
         }

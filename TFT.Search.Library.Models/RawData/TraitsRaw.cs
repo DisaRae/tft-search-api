@@ -24,31 +24,135 @@ namespace TFT.Search.Library.Models
         [JsonPropertyName("effects")]
         public List<Effects> Effects { get; set; }
 
+        public string UnitScale
+        {
+            get
+            {
+                string unitScale = string.Empty;
+                Effects.Select(x=>x.MinUnits).ToList().ForEach(x=>unitScale += (x.ToString()+"/"));
+                return unitScale;
+            }
+        }
+
+        public Traits CleanTraits()
+        {
+            var result = new Traits()
+            {
+                Name = Name,
+                ApiName = ApiName,
+                Icon = Icon,
+            };
+
+            // Set Unit scale
+            string unitScale = string.Empty;
+            Effects.Select(x => x.MinUnits).ToList().ForEach(x => unitScale += (x.ToString() + "/"));
+            result.UnitScale = unitScale;
+
+            //  Don't want the UI to break with any nulls so empty string is fine
+            var description = Desc ?? string.Empty;
+            if (Effects == null || Effects.Count == 0 || string.IsNullOrWhiteSpace(description))
+            {
+                result.Description = description;
+                return result;
+            }
+
+            ScrubHtmlTags();
+
+            //  We want to flatten all the Variable values into a scaling string
+            var scaledValues = new Dictionary<string, string>();
+            IEnumerable<string> variableNamesAccrossTraitEffects = new List<string>();
+
+            foreach (var effect in Effects)
+            {
+                var stringVariables = effect.Variables.ToString();
+                Dictionary<string, dynamic> variables = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(stringVariables);
+                if (effect.MinUnits == Effects.FirstOrDefault()?.MinUnits)
+                {
+                    variableNamesAccrossTraitEffects = variables.Select(x => x.Key);
+                    foreach (var name in variableNamesAccrossTraitEffects)
+                    {
+                        var keyword = String.Empty;
+                        if (variables.ContainsKey(name) == false) continue;
+                        keyword = variables[name].ToString();
+                        var parsedForPercentage = ParseScalingValues(keyword);
+                        scaledValues.Add(name, parsedForPercentage);
+                    }
+                }
+                else
+                {
+                    foreach (var name in variableNamesAccrossTraitEffects)
+                    {
+                        var keyword = String.Empty;
+                        if (variables.ContainsKey(name) == false) continue;
+                        keyword = variables[name].ToString();
+                        var parsedForPercentage = ParseScalingValues(keyword);
+                        scaledValues[name] += ("/" + parsedForPercentage);
+                    }
+                }
+            }
+
+            Regex ItemRegex = new Regex("@[A-Za-z0-9*]*@", RegexOptions.Compiled);
+            //if (this.Name == "Voracity")
+            //    Debug.WriteLine("catch");
+
+            foreach (Match ItemMatch in ItemRegex.Matches(Desc))
+            {
+                var tagName = ItemMatch.Value.Replace('@', ' ').Trim();
+                //  This is only if it's a percentage, I think
+                string[] possibleTagNames = new string[0];
+                //  I don't know why they put astrisks in the tags sometimes
+                if (tagName.Contains('*'))
+                {
+                    possibleTagNames = tagName.Split('*');
+                    tagName = possibleTagNames[0];
+                }
+
+                //  This is not precise, but works 95% of the time for now
+                string matchValue = String.Empty;
+                if (tagName == "MinUnits")
+                    matchValue = result.UnitScale;
+                else
+                    scaledValues.TryGetValue(tagName, out matchValue);
+                Desc = Desc.Replace(ItemMatch.Value, matchValue);
+            }
+            result.Description = Desc;
+            return result;
+        }
+
+        private static string ParseScalingValues(string value)
+        {
+            string matchValue = "";
+            decimal number = 0;
+            if (Decimal.TryParse(value, out number))
+            {
+                //  Value is a percentage
+                if (number < 1)
+                {
+                    number = Math.Round(number, 2) * 100;
+                    matchValue = number.ToString() + "%";
+                }
+                else
+                    matchValue = Math.Round(number, 2).ToString();
+            }
+            return matchValue;
+        }
     }
 
     public class Effects
     {
-
+        //  Shows whether it scales every 1 or 2 champions with the trait
         [JsonProperty("maxUnits")]
         public int MaxUnits { get; set; }
 
+        //  IE. minimum 2 or 3 units
         [JsonProperty("minUnits")]
         public int MinUnits { get; set; }
 
+        //  I think this is a numeric value for bronze, silver, gold, platinum
         [JsonProperty("style")]
         public int Style { get; set; }
 
         [JsonProperty("variables")]
-        public object VariablesRaw { get; set; }
-
-        public Dictionary<string, dynamic> Variables
-        {
-            get {
-                var stringVariables = VariablesRaw.ToString();
-                //var removeBrackets = stringVariables.Substring(1, stringVariables.Length - 2);
-                Dictionary<string, dynamic> variables = JsonConvert.DeserializeObject<Dictionary<string,dynamic>>(stringVariables);
-                return variables;
-            }
-        }
+        public object Variables { get; set; }
     }
 }

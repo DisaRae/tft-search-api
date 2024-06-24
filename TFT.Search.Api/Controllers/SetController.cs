@@ -34,7 +34,7 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet, Route("current/traits")]
-        public IEnumerable<TraitsRaw> Traits()
+        public IEnumerable<Traits> Traits()
         {
             var dataset = _builder.CurrentSet;
             if (dataset == null)
