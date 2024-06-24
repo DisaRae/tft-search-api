@@ -22,7 +22,7 @@ namespace TFT.Search.Library.Models.RawData
         {
             get
             {
-                var replacedImageType = (_icon ?? string.Empty).Replace(".dds", ".png");
+                var replacedImageType = (_icon ?? string.Empty).Replace(".dds", ".png").Replace(".tex", ".png");
                 return _imageBaseUrl + replacedImageType.ToLower() ?? string.Empty;
             }
             set
