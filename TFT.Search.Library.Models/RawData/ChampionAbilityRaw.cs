@@ -121,6 +121,8 @@ namespace TFT.Search.Library.Models.RawData
                         matchValue += Math.Round(x ?? 0, 2).ToString() + "/";
                 }
             });
+            if(matchValue.Length > 1)
+                matchValue = matchValue.Substring(0, matchValue.Length - 1);
             return matchValue;
         }
     }
