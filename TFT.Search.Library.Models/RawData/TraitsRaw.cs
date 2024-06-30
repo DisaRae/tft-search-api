@@ -88,7 +88,8 @@ namespace TFT.Search.Library.Models
                     {
                         var keyword = String.Empty;
                         if (variables.ContainsKey(name) == false) continue;
-                        keyword = variables[name].ToString();
+                        var numberValue = Convert.ToDecimal(variables[name]);
+                        keyword = Math.Round(numberValue).ToString();
                         var parsedForPercentage = ParseScalingValues(keyword);
                         scaledValues.Add(name, parsedForPercentage);
                     }
@@ -99,7 +100,8 @@ namespace TFT.Search.Library.Models
                     {
                         var keyword = String.Empty;
                         if (variables.ContainsKey(name) == false) continue;
-                        keyword = variables[name].ToString();
+                        var numberValue = Convert.ToDecimal(variables[name]);
+                        keyword = Math.Round(numberValue).ToString();
                         var parsedForPercentage = ParseScalingValues(keyword);
                         scaledValues[name] += ("/" + parsedForPercentage);
                     }
