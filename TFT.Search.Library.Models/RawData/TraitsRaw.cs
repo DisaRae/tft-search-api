@@ -58,6 +58,8 @@ namespace TFT.Search.Library.Models
             // Set Unit scale
             string unitScale = string.Empty;
             Effects.Select(x => x.MinUnits).ToList().ForEach(x => unitScale += (x.ToString() + "/"));
+            if(unitScale.Length > 1)
+                unitScale = unitScale[..^1];
             result.UnitScale = unitScale;
 
             //  Don't want the UI to break with any nulls so empty string is fine
