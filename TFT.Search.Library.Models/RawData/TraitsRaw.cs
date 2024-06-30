@@ -74,6 +74,7 @@ namespace TFT.Search.Library.Models
             var scaledValues = new Dictionary<string, string>();
             IEnumerable<string> variableNamesAccrossTraitEffects = new List<string>();
 
+            //  Actually, I think there's a better way to do this...
             foreach (var effect in Effects)
             {
                 var stringVariables = effect.Variables.ToString();
@@ -141,7 +142,7 @@ namespace TFT.Search.Library.Models
                 if (number < 1)
                 {
                     number = Math.Round(number, 2) * 100;
-                    matchValue = number.ToString() + "%";
+                    matchValue = number.ToString();
                 }
                 else
                     matchValue = Math.Round(number, 2).ToString();
