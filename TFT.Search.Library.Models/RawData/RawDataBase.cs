@@ -11,7 +11,7 @@ namespace TFT.Search.Library.Models.RawData
     //  Lets revisit this because I would like to keep this scrub method internal, but obviously I haven't built a full description override for Trait
     public class RawDataBase
     {
-        internal string _imageBaseUrl = "https://raw.communitydragon.org/14.9/game/";
+        internal string _imageBaseUrl = "https://raw.communitydragon.org/latest/game/";
 
         [JsonPropertyName("desc")]
         public string Desc { get; set; }
