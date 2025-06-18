@@ -98,7 +98,10 @@ namespace TFT.Search.Library.Repositories
                     var traits = new List<Traits>();
                     if (rawSet.Traits != null)
                         foreach (var trait in rawSet.Traits)
-                             traits.Add(trait.CleanTraits());
+                        {
+                            var cleanedTraits = trait.CleanTraits();
+                            traits.Add(cleanedTraits);
+                        }
                     set.Traits = traits;
                     result.Add(set);
                 });

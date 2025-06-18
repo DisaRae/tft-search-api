@@ -89,12 +89,12 @@ namespace TFT.Search.Library.Models
                         var keyword = String.Empty;
                         if (variables.ContainsKey(name) == false) continue;
                         var numberValue = variables[name];
-                        if (numberValue.ToString() == "null")
+                        if (numberValue is null || numberValue.ToString() == "null")
                         {
                             scaledValues.Add(name, keyword);
                             continue;
                         }
-                        keyword = Math.Round(numberValue).ToString();
+                        keyword = Math.Round((decimal)numberValue).ToString();
                         var parsedForPercentage = ParseScalingValues(keyword);
                         scaledValues.Add(name, parsedForPercentage);
                     }
@@ -106,12 +106,12 @@ namespace TFT.Search.Library.Models
                         var keyword = String.Empty;
                         if (variables.ContainsKey(name) == false) continue;
                         var numberValue = variables[name];
-                        if (numberValue.ToString() == "null")
+                        if (numberValue is null || numberValue.ToString() == "null")
                         {
                             scaledValues[name] += keyword;
                             continue;
                         }
-                        keyword = Math.Round(numberValue).ToString();
+                        keyword = Math.Round((decimal)numberValue).ToString();
                         var parsedForPercentage = ParseScalingValues(keyword);
                         scaledValues[name] += ("/" + parsedForPercentage);
                     }
