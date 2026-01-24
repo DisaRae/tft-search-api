@@ -68,7 +68,7 @@ namespace TFT.Search.Library.Models.RawData
 
                 //  There is a list of potential stat values that may or may not scale depending on star level
                 string matchValue = "";
-                if (potentialValues != null)
+                if (potentialValues != null && potentialValues?.Value != null)
                 {
                     //  If all the variable values are the same, then it's a non-scaling stat
                     if (potentialValues.Value.All(o => o == potentialValues.Value[0]))

@@ -96,7 +96,8 @@ namespace TFT.Search.Library.Models
                         }
                         keyword = Math.Round((decimal)numberValue).ToString();
                         var parsedForPercentage = ParseScalingValues(keyword);
-                        scaledValues.Add(name, parsedForPercentage);
+                        if(scaledValues.ContainsKey(name) == false)
+                            scaledValues.Add(name, parsedForPercentage);
                     }
                 }
                 else
