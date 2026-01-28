@@ -32,6 +32,7 @@ namespace TFT.Search.Library.Repositories
                 CurrentSetId = _tftService.GetCurrentSetId() ?? 0;
                 AllSets = _tftService.GetSets();
                 CurrentSet = _tftService.GetSet(CurrentSetId);
+                DataLastRetrieved = DateTime.Now;
             }
         }
     }
