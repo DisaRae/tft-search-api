@@ -2,34 +2,29 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace TFT.Search.Library.Models.RawData
+namespace TFT.Search.Library.Repositories
 {
-    //  Lets revisit this because I would like to keep this scrub method internal, but obviously I haven't built a full description override for Trait
-    public class RawDataBase
+    /// <summary>
+    /// Who likes Regex?
+    /// </summary>
+    internal static class HtmlTagScrubbingService
     {
-        internal string _imageBaseUrl = "https://raw.communitydragon.org/latest/game/";
-
-        [JsonPropertyName("desc")]
-        public string Desc { get; set; }
-
         // "@[A-Za-z]*@"
         //  "<[A-Za-z]*>|<\/[A-Za-z]*>"
         //  "\(%[A-Za-z:]*%\)"gm
         //  <[A-Za-z]*>^(<br>)$|<\/[A-Za-z]*>
         //  https://regex101.com/
-        public void ScrubHtmlTags()
+        public static string ScrubHtmlTags(string description)
         {
-            var description = Desc ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(description)) return;
+            if (string.IsNullOrWhiteSpace(description)) return string.Empty;
             var newLineAdded = Regex.Replace(description, "<\\bbr\\b>", "\r\n");
             var descriptionCleanedofTags = Regex.Replace(newLineAdded, "<[A-Za-z]*>|<\\/[A-Za-z]*>", "");
             var descriptionCleaned = Regex.Replace(descriptionCleanedofTags, "\\(%i:[A-Za-z]*%\\)|%[A-Za-z:]*%", "");
             var spacesConverted = descriptionCleaned.Replace("&nbsp;", " ");
-            Desc = spacesConverted;
+            return spacesConverted;
         }
     }
 }

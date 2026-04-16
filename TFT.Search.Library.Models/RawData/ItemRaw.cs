@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace TFT.Search.Library.Models.RawData
 {
-    public class ItemRaw
+    public class ItemRaw: BaseModel
     {
         [JsonProperty("apiName")]
         [JsonPropertyName("apiName")]
@@ -22,10 +22,6 @@ namespace TFT.Search.Library.Models.RawData
         [JsonPropertyName("composition")]
         public List<object> Composition { get; set; }
 
-        [JsonProperty("desc")]
-        [JsonPropertyName("desc")]
-        public string Description { get; set; }
-
         [JsonProperty("effects")]
         [JsonPropertyName("effects")]
         public object Effects { get; set; }
@@ -33,10 +29,6 @@ namespace TFT.Search.Library.Models.RawData
         [JsonProperty("from")]
         [JsonPropertyName("from")]
         public object From { get; set; }
-
-        [JsonProperty("icon")]
-        [JsonPropertyName("icon")]
-        public string Icon { get; set; }
 
         [JsonProperty("id")]
         [JsonPropertyName("id")]

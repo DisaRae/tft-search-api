@@ -12,11 +12,11 @@ namespace TFT.Search.Api.Controllers
     [Route("[controller]")]
     public class SetController : ControllerBase
     {
-        private readonly TftDataBuilder _builder;
+        private readonly TftDataStore _builder;
 
         //private readonly ILogger _logger;
 
-        public SetController(TftDataBuilder builder)
+        public SetController(TftDataStore builder)
         {
             //_logger = logger;
             _builder = builder;

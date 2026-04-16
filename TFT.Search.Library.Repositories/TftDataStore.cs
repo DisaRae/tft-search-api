@@ -8,7 +8,10 @@ using TFT.Search.Library.Models;
 
 namespace TFT.Search.Library.Repositories
 {
-    public class TftDataBuilder
+    /// <summary>
+    /// 
+    /// </summary>
+    public class TftDataStore
     {
         public Set CurrentSet { get; set; }
         public IEnumerable<Set> AllSets { get; set; }
@@ -17,7 +20,7 @@ namespace TFT.Search.Library.Repositories
 
         private readonly ITftService _tftService;
 
-        public TftDataBuilder(ITftService tftService)
+        public TftDataStore(ITftService tftService)
         {
             _tftService = tftService;
             CheckDataLastRetrievedAndRefreshIfNecessary();
@@ -30,8 +33,9 @@ namespace TFT.Search.Library.Repositories
             {
                 _tftService.RefreshData();
                 CurrentSetId = _tftService.GetCurrentSetId() ?? 0;
-                AllSets = _tftService.GetSets();
-                CurrentSet = _tftService.GetSet(CurrentSetId);
+                // We aren't using historic sets, so why waste resouces cleaning and populating it?
+                //AllSets = _tftService.GetSets();
+                CurrentSet = _tftService.GetCurrentSet();
                 DataLastRetrieved = DateTime.Now;
             }
         }

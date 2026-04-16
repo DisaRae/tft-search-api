@@ -12,12 +12,12 @@ namespace TFT.Search.Api.Controllers
     [Route("set/current/champions")]
     public class ChampionsController : Controller
     {
-        private readonly TftDataBuilder _builder;
+        private readonly TftDataStore _builder;
         private const string _key = "53567bbe-4d5f-4513-8595-3d9417839f93";
 
         //private readonly ILogger _logger;
 
-        public ChampionsController(TftDataBuilder builder)
+        public ChampionsController(TftDataStore builder)
         {
             //_logger = logger;
             _builder = builder;
@@ -46,7 +46,7 @@ namespace TFT.Search.Api.Controllers
             var currentSetChampions = _builder.CurrentSet?.Champions;
             if (_builder.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
-            var foundChampions = currentSetChampions.Where(x => (x.Ability?.Desc ?? String.Empty).ToLower().Contains(keyword.ToLower()));
+            var foundChampions = currentSetChampions.Where(x => (x.Ability?.Description ?? String.Empty).ToLower().Contains(keyword.ToLower()));
             return foundChampions;
         }
     }

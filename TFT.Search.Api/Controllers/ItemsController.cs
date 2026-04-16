@@ -13,12 +13,12 @@ namespace TFT.Search.Api.Controllers
     [Route("set/current/items")]
     public class ItemsController : Controller
     {
-        private readonly TftDataBuilder _builder;
+        private readonly TftDataStore _builder;
         private const string _key = "53567bbe-4d5f-4513-8595-3d9417839f93";
 
         //private readonly ILogger _logger;
 
-        public ItemsController(TftDataBuilder builder)
+        public ItemsController(TftDataStore builder)
         {
             //_logger = logger;
             _builder = builder;

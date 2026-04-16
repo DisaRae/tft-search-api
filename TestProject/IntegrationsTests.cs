@@ -15,7 +15,7 @@ namespace TestProject
             var currentChampions = currentSet?.Champions;
             Assert.NotNull(currentChampions);
             var kat = currentChampions?.FirstOrDefault(x => x.Name.Contains("Cho"));
-            var championsWithWounds = currentChampions?.Where(x => x?.Ability?.Desc?.Contains("Wound") ?? false);
+            var championsWithWounds = currentChampions?.Where(x => x?.Ability?.Description?.Contains("Wound") ?? false);
             Assert.NotNull(championsWithWounds?.Count());
         }
 
@@ -24,7 +24,7 @@ namespace TestProject
         {
             var repo = new TftRepository();
             var service = new TftService(repo);
-            TftDataBuilder builder = new TftDataBuilder(service);
+            TftDataStore builder = new TftDataStore(service);
             var traits = builder.CurrentSet?.Traits;
             Assert.NotNull(traits);
         }

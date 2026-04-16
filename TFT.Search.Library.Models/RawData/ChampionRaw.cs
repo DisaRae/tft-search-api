@@ -12,7 +12,7 @@ using static System.Net.WebRequestMethods;
 
 namespace TFT.Search.Library.Models.RawData
 {
-    public class ChampionRaw : RawDataBase
+    public class ChampionRaw : BaseModel
     {
         [JsonProperty("ability")]
         [JsonPropertyName("ability")]
@@ -29,22 +29,6 @@ namespace TFT.Search.Library.Models.RawData
         [JsonProperty("cost")]
         [JsonPropertyName("cost")]
         public int? Cost { get; set; }
-
-        [JsonProperty("icon")]
-        [JsonPropertyName("icon")]
-        public string Icon
-        {
-            get
-            {
-                var replacedImageType = (_icon ?? string.Empty).Replace(".tex", ".png");
-                return _imageBaseUrl + replacedImageType.ToLower() ?? string.Empty;
-            }
-            set
-            {
-                _icon = value;
-            }
-        }
-        private string _icon;
 
         [JsonProperty("name")]
         [JsonPropertyName("name")]

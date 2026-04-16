@@ -12,21 +12,20 @@ namespace TFT.Search.Library.Repositories
     public interface ITftService
     {
         int? GetCurrentSetId();
-        IEnumerable<Set> GetSets();
-        Set GetSet(int setId); 
+        Set GetCurrentSet();
         void RefreshData();
     }
-    public class TftService: ITftService
+    public class TftService : ITftService
     {
         private readonly ITftRepository _tftRepository;
         private RawCdragon _tftData { get; set; }
-        private IEnumerable<Set> _sets { get; set; }
+        private IDictionary<int, Set> _sets { get; set; }
 
         public TftService(ITftRepository tftRepository)
         {
             _tftRepository = tftRepository;
             _tftData = LoadRawData();
-            _sets = CleanRawData(); 
+            _sets = new Dictionary<int, Set>();
         }
 
         private RawCdragon LoadRawData()
@@ -39,7 +38,7 @@ namespace TFT.Search.Library.Repositories
         public void RefreshData()
         {
             _tftData = LoadRawData();
-            _sets = CleanRawData();
+            //_sets = CleanRawData();
         }
 
         public int? GetCurrentSetId()
@@ -51,16 +50,18 @@ namespace TFT.Search.Library.Repositories
             return currentSet?.Id;
         }
 
-        public IEnumerable<Set> GetSets()
+        public Set GetCurrentSet()
         {
-            return _sets;
+            var currentSetId = GetCurrentSetId();
+            var currentSetRaw = _tftData.SetData.FirstOrDefault(x => x.Id == currentSetId);
+            var currentSet = CleanRawSet(currentSetRaw);
+            return currentSet;
         }
 
-        public Set GetSet(int setId)
-        {
-            return _sets.FirstOrDefault(x => x.Id == setId);
-        }
-
+        /// <summary>
+        /// Again, not using historic sets at this time.  Will leave in if I ever see the need to expand.
+        /// </summary>
+        /// <returns>IEnumerable<Set></Set></returns>
         private IEnumerable<Set> CleanRawData()
         {
             List<Set> result = new List<Set>();
@@ -73,42 +74,79 @@ namespace TFT.Search.Library.Repositories
                 Set set = null;
                 object lockObject = new object();
 
-                Task cleanChampions = Task.Factory.StartNew(() =>
-                {
-                    //  Scrubbing text description
-                    if (rawSet.Champions != null)
-                        foreach (var champion in rawSet.Champions)
-                        {
-                            if (champion.Ability != null)
-                                champion.Ability.FormatDescription();
-                        }
-
-                });
-
-                cleanChampions.ContinueWith(x =>
-                {
-                    set = CleanRawSet(rawSet);
-                    var itemsAndAugments = GetItemsAndAugments(rawSet.Id);
-                    set.Items = itemsAndAugments.Item1;
-                    set.Augments = itemsAndAugments.Item2;
-                });
-
-                cleanChampions.ContinueWith(x =>
-                {
-                    var traits = new List<Traits>();
-                    if (rawSet.Traits != null)
-                        foreach (var trait in rawSet.Traits)
-                        {
-                            var cleanedTraits = trait.CleanTraits();
-                            traits.Add(cleanedTraits);
-                        }
-                    set.Traits = traits;
-                    result.Add(set);
-                });
-
-                cleanChampions.Wait();
+                set = CleanRawSet(rawSet);
+                result.Add(set);
             });
             return result;
+        }
+
+        private Set CleanRawSet(SetRaw rawSet)
+        {
+            Set set = null;
+            object lockObject = new object();
+
+            //  If Champions or Traits are null, the whole set might as well be null
+            if (rawSet.Champions is null || rawSet.Traits is null)
+                return set;
+
+            var deepCopyRawChampions = DeepCopyObjectExtension.DeepCopy<List<ChampionRaw>>(rawSet.Champions);
+            var deepCopyRawTraits = DeepCopyObjectExtension.DeepCopy<List<TraitsRaw>>(rawSet.Traits);
+
+            set = RemoveUnneededFields(rawSet);
+
+
+            // I think I set it up to use the non-dto fields to populate the description before scrubbing them
+            Task cleanChampions = Task.Factory.StartNew(() =>
+            {
+                //  Scrubbing text description
+                foreach (var champion in deepCopyRawChampions)
+                {
+                    if (champion.Ability != null)
+                        champion.Ability = ChampionAbilityValueTagPopulationService.FormatDescription(champion.Ability);
+                }
+
+                lock(lockObject)
+                {
+                    rawSet.Champions = deepCopyRawChampions;
+                }
+            });
+
+            Task cleanItemsAndAugments = Task.Factory.StartNew(() =>
+            {
+                int setId = 0;
+                lock (lockObject)
+                {
+                    setId = rawSet.Id;
+                }
+                var itemsAndAugments = GetItemsAndAugments(setId);
+                lock (lockObject)
+                {
+                    set.Items = itemsAndAugments.Item1;
+                    set.Augments = itemsAndAugments.Item2;
+                }
+            });
+
+            Task cleanTraits = Task.Factory.StartNew(() =>
+            {
+
+                var traits = new List<Traits>();
+                foreach (var trait in deepCopyRawTraits)
+                {
+                    var cleanedTraits = TraitScrubbingService.CleanTraits(trait);
+                    traits.Add(cleanedTraits);
+                }
+
+                cleanChampions.ContinueWith(x =>
+                {
+                    lock (lockObject)
+                    {
+                        set.Traits = traits;
+                    }
+                });
+            });
+
+            Task.WaitAll(cleanChampions, cleanTraits, cleanItemsAndAugments);
+            return set;
         }
 
         private (IEnumerable<Item>, IEnumerable<Augment>) GetItemsAndAugments(int setId)
@@ -139,8 +177,12 @@ namespace TFT.Search.Library.Repositories
             return (itemList, augmentList);
         }
 
-        //  Remove irrelevant data
-        private Set CleanRawSet(SetRaw startingSet)
+        /// <summary>
+        ///  Remove data irrelevant to our purposes by casting to a more limited data model
+        /// </summary>
+        /// <param name="startingSet"></param>
+        /// <returns></returns>
+        private static Set RemoveUnneededFields(SetRaw startingSet)
         {
             if (startingSet == null)
                 return null;

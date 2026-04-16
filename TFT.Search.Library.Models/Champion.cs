@@ -32,12 +32,8 @@ namespace TFT.Search.Library.Models
         public List<string> Traits { get; set; }
     }
 
-    public class ChampionAbility: RawDataBase
+    public class ChampionAbility: BaseModel
     {
-
-        [JsonProperty("icon")]
-        public string Icon { get; set; }
-
         [JsonProperty("name")]
         public string Name { get; set; }
     }

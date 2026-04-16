@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using TFT.Search.Library.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +7,7 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 // Add services to the container.
 builder.Services.AddSingleton<ITftRepository, TftRepository>();
 builder.Services.AddSingleton<ITftService, TftService>();
-builder.Services.AddSingleton<TftDataBuilder>();
+builder.Services.AddSingleton<TftDataStore>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -23,14 +22,6 @@ builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-/*
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-*/
-
 app.UseSwagger();
 app.UseSwaggerUI();
 
