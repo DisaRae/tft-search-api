@@ -9,7 +9,7 @@ using TFT.Search.Library.Models;
 namespace TFT.Search.Library.Repositories
 {
     /// <summary>
-    /// 
+    /// An instance of this class is used to store TFT data in memory. It will be refreshed every 2 hours, or when the application starts up. This is to avoid making unnecessary calls to the Riot API, which has rate limits.
     /// </summary>
     public class TftDataStore
     {

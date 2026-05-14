@@ -36,11 +36,13 @@ namespace TFT.Search.Library.Models
     {
         //  Shows whether it scales every 1 or 2 champions with the trait
         [JsonProperty("maxUnits")]
-        public int? MaxUnits { get; set; }
+        [Newtonsoft.Json.JsonConverter(typeof(NullToZeroConverter))]
+        public int MaxUnits { get; set; }
 
         //  IE. minimum 2 or 3 units
         [JsonProperty("minUnits")]
-        public int? MinUnits { get; set; }
+        [Newtonsoft.Json.JsonConverter(typeof(NullToZeroConverter))]
+        public int MinUnits { get; set; }
 
         //  I think this is a numeric value for bronze, silver, gold, platinum
         [JsonProperty("style")]

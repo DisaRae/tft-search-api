@@ -15,180 +15,179 @@ namespace TFT.Search.Library.Repositories
         Set GetCurrentSet();
         void RefreshData();
     }
+
     public class TftService : ITftService
     {
         private readonly ITftRepository _tftRepository;
         private RawCdragon _tftData { get; set; }
-        private IDictionary<int, Set> _sets { get; set; }
 
         public TftService(ITftRepository tftRepository)
         {
-            _tftRepository = tftRepository;
+            _tftRepository = tftRepository ?? throw new ArgumentNullException(nameof(tftRepository));
             _tftData = LoadRawData();
-            _sets = new Dictionary<int, Set>();
         }
 
         private RawCdragon LoadRawData()
         {
-            //return LoadJson<RawCdragon>("C:\\Users\\raeka\\OneDrive\\Desktop\\TftSearch\\TFT.Search\\raw_cdragon_tft.json");
-            var result = _tftRepository.GetJsonFile();
-            return result;
+            return _tftRepository.GetJsonFile();
         }
 
         public void RefreshData()
         {
             _tftData = LoadRawData();
-            //_sets = CleanRawData();
         }
 
         public int? GetCurrentSetId()
         {
-            if (_tftData == null)
+            var setData = _tftData?.SetData;
+            if (setData == null || !setData.Any())
                 return null;
-            var orderedSetData = _tftData.SetData?.OrderByDescending(x => x.Id);
-            var currentSet = orderedSetData?.FirstOrDefault();
-            return currentSet?.Id;
+            return setData.OrderByDescending(x => x.Id).First().Id;
         }
 
         public Set GetCurrentSet()
         {
             var currentSetId = GetCurrentSetId();
-            var currentSetRaw = _tftData.SetData.FirstOrDefault(x => x.Id == currentSetId);
-            var currentSet = CleanRawSet(currentSetRaw);
-            return currentSet;
+            if (currentSetId == null)
+                return null;
+
+            var currentSetRaw = _tftData?.SetData?.FirstOrDefault(x => x.Id == currentSetId.Value);
+            if (currentSetRaw == null)
+                return null;
+
+            return CleanRawSet(currentSetRaw);
         }
 
         /// <summary>
-        /// Again, not using historic sets at this time.  Will leave in if I ever see the need to expand.
+        /// Not using historic sets at this time.
         /// </summary>
-        /// <returns>IEnumerable<Set></Set></returns>
         private IEnumerable<Set> CleanRawData()
         {
-            List<Set> result = new List<Set>();
+            if (_tftData?.SetData == null)
+                return Enumerable.Empty<Set>();
 
-            if (_tftData == null && _tftData.SetData != null)
-                return null;
-
-            _tftData.SetData.ForEach(rawSet =>
+            var results = new List<Set>();
+            foreach (var rawSet in _tftData.SetData)
             {
-                Set set = null;
-                object lockObject = new object();
-
-                set = CleanRawSet(rawSet);
-                result.Add(set);
-            });
-            return result;
+                var cleaned = CleanRawSet(rawSet);
+                if (cleaned != null)
+                    results.Add(cleaned);
+            }
+            return results;
         }
 
         private Set CleanRawSet(SetRaw rawSet)
         {
-            Set set = null;
-            object lockObject = new object();
+            if (rawSet == null || rawSet.Champions == null || rawSet.Traits == null)
+                return null;
 
-            //  If Champions or Traits are null, the whole set might as well be null
-            if (rawSet.Champions is null || rawSet.Traits is null)
-                return set;
+            // Make deep copies so we do not mutate original rawSet
+            var deepCopyChampions = DeepCopyObjectExtension.DeepCopy<List<ChampionRaw>>(rawSet.Champions) ?? new List<ChampionRaw>();
+            var deepCopyTraits = DeepCopyObjectExtension.DeepCopy<List<TraitsRaw>>(rawSet.Traits) ?? new List<TraitsRaw>();
 
-            var deepCopyRawChampions = DeepCopyObjectExtension.DeepCopy<List<ChampionRaw>>(rawSet.Champions);
-            var deepCopyRawTraits = DeepCopyObjectExtension.DeepCopy<List<TraitsRaw>>(rawSet.Traits);
+            // Prepare containers for cleaned data
+            List<Champion> finalChampions = null;
+            List<Traits> finalTraits = null;
+            IEnumerable<Item> items = null;
+            IEnumerable<Augment> augments = null;
 
-            set = RemoveUnneededFields(rawSet);
-
-
-            // I think I set it up to use the non-dto fields to populate the description before scrubbing them
-            Task cleanChampions = Task.Factory.StartNew(() =>
+            // Clean champions: format ability descriptions then map to DTO
+            var championTask = Task.Run(() =>
             {
-                //  Scrubbing text description
-                foreach (var champion in deepCopyRawChampions)
+                foreach (var champ in deepCopyChampions)
                 {
-                    if (champion.Ability != null)
-                        champion.Ability = ChampionAbilityValueTagPopulationService.FormatDescription(champion.Ability);
+                    if (champ.Ability != null)
+                        champ.Ability = ChampionAbilityValueTagPopulationService.FormatDescription(champ.Ability);
                 }
-
-                lock(lockObject)
-                {
-                    rawSet.Champions = deepCopyRawChampions;
-                }
+                var serialized = JsonConvert.SerializeObject(deepCopyChampions);
+                finalChampions = JsonConvert.DeserializeObject<List<Champion>>(serialized) ?? new List<Champion>();
             });
 
-            Task cleanItemsAndAugments = Task.Factory.StartNew(() =>
+            // Clean traits
+            var traitsTask = Task.Run(() =>
             {
-                int setId = 0;
-                lock (lockObject)
+                var list = new List<Traits>();
+                foreach (var tr in deepCopyTraits)
                 {
-                    setId = rawSet.Id;
+                    var cleaned = TraitScrubbingService.CleanTraits(tr);
+                    if (cleaned != null)
+                        list.Add(cleaned);
                 }
-                var itemsAndAugments = GetItemsAndAugments(setId);
-                lock (lockObject)
-                {
-                    set.Items = itemsAndAugments.Item1;
-                    set.Augments = itemsAndAugments.Item2;
-                }
+                finalTraits = list;
             });
 
-            Task cleanTraits = Task.Factory.StartNew(() =>
+            // Items and augments
+            var itemsTask = Task.Run(() =>
             {
-
-                var traits = new List<Traits>();
-                foreach (var trait in deepCopyRawTraits)
-                {
-                    var cleanedTraits = TraitScrubbingService.CleanTraits(trait);
-                    traits.Add(cleanedTraits);
-                }
-
-                cleanChampions.ContinueWith(x =>
-                {
-                    lock (lockObject)
-                    {
-                        set.Traits = traits;
-                    }
-                });
+                var result = GetItemsAndAugments(rawSet.Id);
+                items = result.Item1 ?? Enumerable.Empty<Item>();
+                augments = result.Item2 ?? Enumerable.Empty<Augment>();
             });
 
-            Task.WaitAll(cleanChampions, cleanTraits, cleanItemsAndAugments);
-            return set;
+            Task.WaitAll(championTask, traitsTask, itemsTask);
+
+            // Build final Set from cleaned pieces. Start from RemoveUnneededFields to strip irrelevant data,
+            // then overwrite the fields with the cleaned collections.
+            var endSet = RemoveUnneededFields(rawSet) ?? new Set { Id = rawSet.Id };
+
+            endSet.Champions = (finalChampions ?? new List<Champion>())
+                                .Where(x => x.Traits != null && x.Traits.Any())
+                                .ToList();
+
+            endSet.Traits = finalTraits ?? new List<Traits>();
+            endSet.Items = items?.ToList() ?? new List<Item>();
+            endSet.Augments = augments?.ToList() ?? new List<Augment>();
+
+            return endSet;
         }
 
         private (IEnumerable<Item>, IEnumerable<Augment>) GetItemsAndAugments(int setId)
         {
-            if (_tftData == null)
-                return (null, null);
-            var orderedSetData = _tftData.Items;
+            var itemsSource = _tftData?.Items;
+            if (itemsSource == null)
+                return (Enumerable.Empty<Item>(), Enumerable.Empty<Augment>());
+
             var itemList = new List<Item>();
             var augmentList = new List<Augment>();
-            foreach (var item in orderedSetData)
+
+            foreach (var item in itemsSource)
             {
-                if (item.ApiName.Contains($"TFT{setId}"))
+                var apiName = item?.ApiName;
+                if (string.IsNullOrEmpty(apiName))
+                    continue;
+
+                if (!apiName.Contains($"TFT{setId}"))
+                    continue;
+
+                var json = JsonConvert.SerializeObject(item);
+                if (apiName.IndexOf("augment", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    if (item.ApiName.ToLower().Contains("augment"))
-                    {
-                        string json = JsonConvert.SerializeObject(item);
-                        var endAugment = JsonConvert.DeserializeObject<Augment>(json);
-                        augmentList.Add(endAugment);
-                    }
-                    else
-                    {
-                        string json = JsonConvert.SerializeObject(item);
-                        var endItem = JsonConvert.DeserializeObject<Item>(json);
-                        itemList.Add(endItem);
-                    }
+                    var aug = JsonConvert.DeserializeObject<Augment>(json);
+                    if (aug != null)
+                        augmentList.Add(aug);
+                }
+                else
+                {
+                    var it = JsonConvert.DeserializeObject<Item>(json);
+                    if (it != null)
+                        itemList.Add(it);
                 }
             }
+
             return (itemList, augmentList);
         }
 
         /// <summary>
-        ///  Remove data irrelevant to our purposes by casting to a more limited data model
+        /// Remove data irrelevant to our purposes by casting to a more limited data model
         /// </summary>
-        /// <param name="startingSet"></param>
-        /// <returns></returns>
         private static Set RemoveUnneededFields(SetRaw startingSet)
         {
             if (startingSet == null)
                 return null;
-            string json = JsonConvert.SerializeObject(startingSet);
+
+            var json = JsonConvert.SerializeObject(startingSet);
             var endSet = JsonConvert.DeserializeObject<Set>(json);
-            if (endSet != null && endSet?.Champions != null)
+            if (endSet?.Champions != null)
                 endSet.Champions = endSet.Champions.Where(x => x.Traits != null && x.Traits.Any()).ToList();
             return endSet;
         }
