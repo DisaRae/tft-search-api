@@ -9,7 +9,7 @@ namespace TFT.Search.Library.Repositories
 {
     internal static class TraitScrubbingService
     {
-        private static readonly Regex TagPattern = new Regex("@[A-Za-z0-9*]*@", RegexOptions.Compiled);
+        private static readonly Regex TagPattern = new Regex(@"@[A-Za-z0-9*._:]*@", RegexOptions.Compiled);
 
         public static Traits CleanTraits(TraitsRaw trait)
         {
