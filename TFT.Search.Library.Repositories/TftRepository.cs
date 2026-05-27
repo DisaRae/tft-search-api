@@ -1,6 +1,7 @@
 using Flurl;
 using Flurl.Http;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 using TFT.Search.Library.Models.RawData;
 
 namespace TFT.Search.Library.Repositories
@@ -13,14 +14,14 @@ namespace TFT.Search.Library.Repositories
         /// <summary>
         /// Returns null when the server responds 304 Not Modified (data unchanged since last fetch).
         /// </summary>
-        RawCdragon GetJsonFile();
+        Task<RawCdragon> GetJsonFileAsync();
     }
 
     public class TftRepository : ITftRepository
     {
         private volatile string _lastEtag;
 
-        public RawCdragon GetJsonFile()
+        public async Task<RawCdragon> GetJsonFileAsync()
         {
             Url url = "https://raw.communitydragon.org/latest/cdragon/tft/en_us.json";
 
@@ -28,7 +29,7 @@ namespace TFT.Search.Library.Repositories
             if (!string.IsNullOrEmpty(_lastEtag))
                 request = request.WithHeader("If-None-Match", _lastEtag);
 
-            var response = request.GetAsync().GetAwaiter().GetResult();
+            var response = await request.GetAsync();
 
             //  304 means the data has not changed since our last fetch — skip the download
             if (response.StatusCode == 304)
@@ -38,7 +39,7 @@ namespace TFT.Search.Library.Repositories
             if (!string.IsNullOrEmpty(etag))
                 _lastEtag = etag;
 
-            var result = response.GetJsonAsync().GetAwaiter().GetResult();
+            var result = await response.GetJsonAsync();
             //  Returns dynamic and we want a string
             var stringResult = JsonConvert.SerializeObject(result);
             //  Map to data objects

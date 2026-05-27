@@ -9,21 +9,19 @@ namespace TFT.Search.Library.Repositories
     {
         private static readonly Regex TagPattern = new Regex("@[A-Za-z0-9*]*@", RegexOptions.Compiled);
 
-        public static ChampionAbilityRaw FormatDescription(ChampionAbilityRaw ability)
+        public static string FormatDescription(ChampionAbilityRaw ability)
         {
             //  Don't want the UI to break with any nulls so empty string is fine
             var description = ability.Description ?? string.Empty;
             if (ability.Variables == null || ability.Variables.Count == 0 || string.IsNullOrWhiteSpace(description))
-            {
-                ability.Description = description;
-                return ability;
-            }
-            ability.Description = HtmlTagScrubbingService.ScrubHtmlTags(ability.Description ?? string.Empty);
+                return description;
+
+            var workingDescription = HtmlTagScrubbingService.ScrubHtmlTags(description);
 
             //if (this.Name == "Voracity")
             //    Debug.WriteLine("catch");
 
-            foreach (Match match in TagPattern.Matches(ability.Description))
+            foreach (Match match in TagPattern.Matches(workingDescription))
             {
                 var tagName = match.Value.Replace('@', ' ').Trim();
                 var possibleTagNames = Array.Empty<string>();
@@ -48,9 +46,9 @@ namespace TFT.Search.Library.Repositories
                     else
                         matchValue = ParseScalingValues(potentialValues);
                 }
-                ability.Description = ability.Description.Replace(match.Value, matchValue);
+                workingDescription = workingDescription.Replace(match.Value, matchValue);
             }
-            return ability;
+            return workingDescription;
         }
 
         private static string ParseNonScalingValues(string[] possibleTagNames, VariableRaw potentialValues)
@@ -67,8 +65,8 @@ namespace TFT.Search.Library.Repositories
                 //  Value is a percentage
                 if (potentialValues.Value[0] < 1)
                 {
-                    potentialValues.Value[0] = Math.Round(potentialValues.Value[0] ?? 0, 2) * 100;
-                    matchValue = potentialValues.Value[0].ToString() + "%";
+                    var roundedPercentage = Math.Round(potentialValues.Value[0] ?? 0, 2) * 100;
+                    matchValue = roundedPercentage.ToString() + "%";
                 }
                 else
                     matchValue = Math.Round(potentialValues.Value[0] ?? 0, 2).ToString();

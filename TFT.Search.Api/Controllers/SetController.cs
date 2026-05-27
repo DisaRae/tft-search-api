@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TFT.Search.Library.Models;
 using TFT.Search.Library.Repositories;
 
@@ -18,12 +19,12 @@ namespace TFT.Search.Api.Controllers
         {
             //_logger = logger;
             _builder = builder;
-            _builder.CheckDataLastRetrievedAndRefreshIfNecessary();
         }
 
         [HttpGet, Route("current")]
-        public Set Get()
+        public async Task<Set> Get()
         {
+            await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             var dataset = _builder.CurrentSet;
             if (dataset == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
@@ -31,8 +32,9 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet, Route("current/traits")]
-        public IEnumerable<Traits> Traits()
+        public async Task<IEnumerable<Traits>> Traits()
         {
+            await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             var dataset = _builder.CurrentSet;
             if (dataset == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
