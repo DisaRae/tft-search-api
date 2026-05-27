@@ -1,7 +1,7 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TFT.Search.Library.Models.RawData;
 using TFT.Search.Library.Models;
@@ -17,6 +17,7 @@ namespace TFT.Search.Library.Repositories
 
     public class TftService : ITftService
     {
+        private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
         private readonly ITftRepository _tftRepository;
         private RawCdragon _tftData { get; set; }
 
@@ -32,7 +33,10 @@ namespace TFT.Search.Library.Repositories
 
         public async Task RefreshDataAsync()
         {
-            _tftData = await LoadRawDataAsync();
+            var newData = await LoadRawDataAsync();
+            //  null means the server returned 304 Not Modified — existing data is still current
+            if (newData != null)
+                _tftData = newData;
         }
 
         public int? GetCurrentSetId()
@@ -91,8 +95,8 @@ namespace TFT.Search.Library.Repositories
             var sourceChampions = rawSet.Champions ?? new List<ChampionRaw>();
             var championTask = Task.Run(() =>
             {
-                var serialized = JsonConvert.SerializeObject(sourceChampions);
-                var mapped = JsonConvert.DeserializeObject<List<Champion>>(serialized) ?? new List<Champion>();
+                var serialized = JsonSerializer.Serialize(sourceChampions, _jsonOptions);
+                var mapped = JsonSerializer.Deserialize<List<Champion>>(serialized, _jsonOptions) ?? new List<Champion>();
                 for (int i = 0; i < mapped.Count && i < sourceChampions.Count; i++)
                 {
                     if (mapped[i].Ability != null && sourceChampions[i].Ability != null)
@@ -157,16 +161,16 @@ namespace TFT.Search.Library.Repositories
                 if (!apiName.Contains($"TFT{setId}"))
                     continue;
 
-                var json = JsonConvert.SerializeObject(item);
+                var json = JsonSerializer.Serialize(item, _jsonOptions);
                 if (apiName.IndexOf("augment", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    var aug = JsonConvert.DeserializeObject<Augment>(json);
+                    var aug = JsonSerializer.Deserialize<Augment>(json, _jsonOptions);
                     if (aug != null)
                         augmentList.Add(aug);
                 }
                 else
                 {
-                    var it = JsonConvert.DeserializeObject<Item>(json);
+                    var it = JsonSerializer.Deserialize<Item>(json, _jsonOptions);
                     if (it != null)
                         itemList.Add(it);
                 }
@@ -176,18 +180,16 @@ namespace TFT.Search.Library.Repositories
         }
 
         /// <summary>
-        /// Remove data irrelevant to our purposes by casting to a more limited data model
+        /// Remove data irrelevant to our purposes by casting to a more limited data model.
+        /// Champions, Traits, Items, and Augments are all replaced after this call, so only
+        /// Id and Name need to be carried over.
         /// </summary>
         private static Set RemoveUnneededFields(SetRaw startingSet)
         {
             if (startingSet == null)
                 return null;
 
-            var json = JsonConvert.SerializeObject(startingSet);
-            var endSet = JsonConvert.DeserializeObject<Set>(json);
-            if (endSet?.Champions != null)
-                endSet.Champions = endSet.Champions.Where(x => x.Traits != null && x.Traits.Any()).ToList();
-            return endSet;
+            return new Set { Id = startingSet.Id, Name = startingSet.Name };
         }
     }
 }

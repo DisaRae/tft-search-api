@@ -1,11 +1,13 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace TFT.Search.Library.Models.RawData
 {
     public class SetRaw
     {
         [JsonProperty("number")]
+        [JsonPropertyName("number")]
         public int Id { get; set; }
 
         [JsonProperty("name")]

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using TFT.Search.Library.Models;
 using TFT.Search.Library.Repositories;
 
@@ -23,16 +22,16 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet, Route("")]
-        public async Task<IEnumerable<Champion>> Champions()
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        public IEnumerable<Champion> Champions()
         {
-            await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             return _builder.CurrentSet?.Champions;
         }
 
         [HttpGet, Route("{name}")]
-        public async Task<IEnumerable<Champion>> Champions(string name)
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        public IEnumerable<Champion> Champions(string name)
         {
-            await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             if (_builder.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
             var nameLower = name.ToLower();
@@ -40,9 +39,9 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet, Route("skills/{keyword}")]
-        public async Task<IEnumerable<Champion>> SearchChampionSkills(string keyword)
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        public IEnumerable<Champion> SearchChampionSkills(string keyword)
         {
-            await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             if (_builder.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
             var keywordLower = keyword.ToLower();
