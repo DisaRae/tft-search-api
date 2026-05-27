@@ -35,7 +35,7 @@ namespace TFT.Search.Library.Repositories
                 return result;
             }
 
-            trait.Description = HtmlTagScrubbingService.ScrubHtmlTags(trait.Description);
+            var workingDescription = HtmlTagScrubbingService.ScrubHtmlTags(description);
 
             //  We want to flatten all the Variable values into a scaling string
             var scaledValues = new Dictionary<string, string>();
@@ -116,7 +116,7 @@ namespace TFT.Search.Library.Repositories
             //if (this.Name == "Voracity")
             //    Debug.WriteLine("catch");
 
-            foreach (Match match in TagPattern.Matches(trait.Description))
+            foreach (Match match in TagPattern.Matches(workingDescription))
             {
                 var tagName = match.Value.Replace('@', ' ').Trim();
                 //  This is only if it's a percentage, I think
@@ -134,9 +134,9 @@ namespace TFT.Search.Library.Repositories
                     matchValue = result.UnitScale;
                 else
                     scaledValues.TryGetValue(tagName, out matchValue);
-                trait.Description = trait.Description.Replace(match.Value, matchValue);
+                workingDescription = workingDescription.Replace(match.Value, matchValue);
             }
-            result.Description = trait.Description;
+            result.Description = workingDescription;
             return result;
         }
 
