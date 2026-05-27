@@ -9,7 +9,7 @@ namespace TestProject
         public void Test1()
         {
             var repo = new TftRepository();
-            var data = repo.GetJsonFile();
+            var data = repo.GetJsonFileAsync().GetAwaiter().GetResult();
             var currentSet = data.SetData.AsEnumerable().OrderByDescending(x=>x.Id).FirstOrDefault();
             Assert.NotNull(currentSet);
             var currentChampions = currentSet?.Champions;

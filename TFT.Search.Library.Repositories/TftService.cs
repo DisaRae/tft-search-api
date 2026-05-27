@@ -12,7 +12,7 @@ namespace TFT.Search.Library.Repositories
     {
         int? GetCurrentSetId();
         Set GetCurrentSet();
-        void RefreshData();
+        Task RefreshDataAsync();
     }
 
     public class TftService : ITftService
@@ -23,17 +23,16 @@ namespace TFT.Search.Library.Repositories
         public TftService(ITftRepository tftRepository)
         {
             _tftRepository = tftRepository ?? throw new ArgumentNullException(nameof(tftRepository));
-            _tftData = LoadRawData();
         }
 
-        private RawCdragon LoadRawData()
+        private async Task<RawCdragon> LoadRawDataAsync()
         {
-            return _tftRepository.GetJsonFile();
+            return await _tftRepository.GetJsonFileAsync();
         }
 
-        public void RefreshData()
+        public async Task RefreshDataAsync()
         {
-            _tftData = LoadRawData();
+            _tftData = await LoadRawDataAsync();
         }
 
         public int? GetCurrentSetId()
