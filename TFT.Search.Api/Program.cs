@@ -8,6 +8,8 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddSingleton<ITftRepository, TftRepository>();
 builder.Services.AddSingleton<ITftService, TftService>();
 builder.Services.AddSingleton<TftDataStore>();
+builder.Services.AddHostedService<TftDataRefreshService>();
+builder.Services.AddResponseCaching();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -28,6 +30,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseCors("corsapp");
+app.UseResponseCaching();
 app.UseAuthorization();
 
 app.MapControllers();

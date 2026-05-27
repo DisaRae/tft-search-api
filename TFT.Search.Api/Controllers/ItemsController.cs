@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using TFT.Search.Library.Models;
 using TFT.Search.Library.Repositories;
 
@@ -23,16 +22,16 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet, Route("")]
-        public async Task<IEnumerable<Item>> Items()
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        public IEnumerable<Item> Items()
         {
-            await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             return _builder.CurrentSet.Items;
         }
 
         [HttpGet, Route("{name}")]
-        public async Task<IEnumerable<Item>> Items(string name)
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        public IEnumerable<Item> Items(string name)
         {
-            await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             if (_builder.CurrentSet.Items == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
             var searchName = name.ToLower();
@@ -40,9 +39,9 @@ namespace TFT.Search.Api.Controllers
         }
 
         [HttpGet, Route("description/{keyword}")]
-        public async Task<IEnumerable<Item>> SearchItemDescriptions(string keyword)
+        [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
+        public IEnumerable<Item> SearchItemDescriptions(string keyword)
         {
-            await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             if (_builder.CurrentSet.Items == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
             var searchKeyword = keyword.ToLower();

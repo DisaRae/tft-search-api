@@ -1,6 +1,6 @@
 using Flurl;
 using Flurl.Http;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TFT.Search.Library.Models.RawData;
 
@@ -19,6 +19,7 @@ namespace TFT.Search.Library.Repositories
 
     public class TftRepository : ITftRepository
     {
+        private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
         private volatile string _lastEtag;
 
         public async Task<RawCdragon> GetJsonFileAsync()
@@ -39,12 +40,10 @@ namespace TFT.Search.Library.Repositories
             if (!string.IsNullOrEmpty(etag))
                 _lastEtag = etag;
 
-            var result = await response.GetJsonAsync();
-            //  Returns dynamic and we want a string
-            var stringResult = JsonConvert.SerializeObject(result);
-            //  Map to data objects
-            var json = JsonConvert.DeserializeObject<RawCdragon>(stringResult);
-            return json;
+            //  Deserialize directly from the response stream — avoids allocating an intermediate string
+            //  and eliminates the extra dynamic → SerializeObject → Deserialize round trip
+            using var stream = await response.GetStreamAsync();
+            return await JsonSerializer.DeserializeAsync<RawCdragon>(stream, _jsonOptions);
         }
     }
 }
