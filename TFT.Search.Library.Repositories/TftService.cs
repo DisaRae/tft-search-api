@@ -33,7 +33,10 @@ namespace TFT.Search.Library.Repositories
 
         public void RefreshData()
         {
-            _tftData = LoadRawData();
+            var newData = LoadRawData();
+            //  null means the server returned 304 Not Modified — existing data is still current
+            if (newData != null)
+                _tftData = newData;
         }
 
         public int? GetCurrentSetId()
