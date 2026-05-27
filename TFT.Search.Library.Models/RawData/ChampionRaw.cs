@@ -26,6 +26,10 @@ namespace TFT.Search.Library.Models.RawData
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
+        [JsonProperty("role")]
+        [JsonPropertyName("role")]
+        public string Role { get; set; }
+
         [JsonProperty("squareIcon")]
         [JsonPropertyName("squareIcon")]
         public string SquareIcon

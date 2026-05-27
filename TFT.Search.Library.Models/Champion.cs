@@ -15,6 +15,9 @@ namespace TFT.Search.Library.Models
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("role")]
+        public string Role { get; set; }
+
         [JsonProperty("squareIcon")]
         public string Icon { get; set; }
 
