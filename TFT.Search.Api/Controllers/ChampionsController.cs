@@ -35,7 +35,8 @@ namespace TFT.Search.Api.Controllers
             await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             if (_builder.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
-            return _builder.CurrentSet.Champions.Where(x => (x.Name ?? string.Empty).ToLower() == name.ToLower());
+            var nameLower = name.ToLower();
+            return _builder.ChampionIndex.Where(e => e.NameLower == nameLower).Select(e => e.Champion);
         }
 
         [HttpGet, Route("skills/{keyword}")]
@@ -44,7 +45,8 @@ namespace TFT.Search.Api.Controllers
             await _builder.CheckDataLastRetrievedAndRefreshIfNecessaryAsync();
             if (_builder.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
-            return _builder.CurrentSet.Champions.Where(x => (x.Ability?.Description ?? string.Empty).ToLower().Contains(keyword.ToLower()));
+            var keywordLower = keyword.ToLower();
+            return _builder.ChampionIndex.Where(e => e.DescriptionLower.Contains(keywordLower)).Select(e => e.Champion);
         }
     }
 }

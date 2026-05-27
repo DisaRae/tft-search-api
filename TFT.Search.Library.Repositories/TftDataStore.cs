@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TFT.Search.Library.Models;
 
@@ -12,6 +14,12 @@ namespace TFT.Search.Library.Repositories
         public Set CurrentSet { get; set; }
         public int CurrentSetId { get; set; }
         public DateTime? DataLastRetrieved { get; set; }
+
+        // Pre-built search indices: lowercased fields computed once at refresh time so
+        // controllers pay zero ToLower() cost per request.
+        public IReadOnlyList<ChampionSearchEntry> ChampionIndex { get; private set; } = Array.Empty<ChampionSearchEntry>();
+        public IReadOnlyList<ItemSearchEntry> ItemIndex { get; private set; } = Array.Empty<ItemSearchEntry>();
+        public IReadOnlyList<AugmentSearchEntry> AugmentIndex { get; private set; } = Array.Empty<AugmentSearchEntry>();
 
         private readonly ITftService _tftService;
 
@@ -33,7 +41,37 @@ namespace TFT.Search.Library.Repositories
                 //AllSets = _tftService.GetSets();
                 CurrentSet = _tftService.GetCurrentSet();
                 DataLastRetrieved = DateTime.Now;
+
+                BuildSearchIndices();
             }
         }
+
+        private void BuildSearchIndices()
+        {
+            ChampionIndex = (CurrentSet?.Champions ?? new List<Champion>())
+                .Select(c => new ChampionSearchEntry(
+                    c,
+                    (c.Name ?? string.Empty).ToLower(),
+                    (c.Ability?.Description ?? string.Empty).ToLower()))
+                .ToList();
+
+            ItemIndex = (CurrentSet?.Items ?? new List<Item>())
+                .Select(i => new ItemSearchEntry(
+                    i,
+                    (i.Name ?? string.Empty).ToLower(),
+                    (i.Description ?? string.Empty).ToLower()))
+                .ToList();
+
+            AugmentIndex = (CurrentSet?.Augments ?? new List<Augment>())
+                .Select(a => new AugmentSearchEntry(
+                    a,
+                    (a.Name ?? string.Empty).ToLower(),
+                    (a.Description ?? string.Empty).ToLower()))
+                .ToList();
+        }
     }
+
+    public sealed record ChampionSearchEntry(Champion Champion, string NameLower, string DescriptionLower);
+    public sealed record ItemSearchEntry(Item Item, string NameLower, string DescriptionLower);
+    public sealed record AugmentSearchEntry(Augment Augment, string NameLower, string DescriptionLower);
 }

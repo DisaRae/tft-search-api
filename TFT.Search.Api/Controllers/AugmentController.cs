@@ -36,7 +36,7 @@ namespace TFT.Search.Api.Controllers
             if (_builder.CurrentSet.Augments == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
             var searchName = name.ToLower();
-            return _builder.CurrentSet.Augments.Where(x => (x.Name ?? string.Empty).ToLower().Contains(searchName));
+            return _builder.AugmentIndex.Where(e => e.NameLower.Contains(searchName)).Select(e => e.Augment);
         }
 
         [HttpGet, Route("description/{keyword}")]
@@ -46,7 +46,7 @@ namespace TFT.Search.Api.Controllers
             if (_builder.CurrentSet.Augments == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
             var searchKeyword = keyword.ToLower();
-            return _builder.CurrentSet.Augments.Where(x => (x.Description ?? string.Empty).ToLower().Contains(searchKeyword));
+            return _builder.AugmentIndex.Where(e => e.DescriptionLower.Contains(searchKeyword)).Select(e => e.Augment);
         }
     }
 }
