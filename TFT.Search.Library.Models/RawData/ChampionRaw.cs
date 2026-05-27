@@ -33,7 +33,7 @@ namespace TFT.Search.Library.Models.RawData
             get
             {
                 var replacedImageType = (_squareIcon ?? string.Empty).Replace(".tex", ".png");
-                if (replacedImageType.StartsWith(_imageBaseUrl))
+                if (replacedImageType.StartsWith("http://") || replacedImageType.StartsWith("https://"))
                     return replacedImageType;
                 return _imageBaseUrl + replacedImageType.ToLower() ?? string.Empty;
             }
