@@ -1,17 +1,16 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using TFT.Search.Library.Models;
 
 namespace TFT.Search.Library.Repositories
 {
     internal static class TraitScrubbingService
     {
+        private static readonly Regex TagPattern = new Regex("@[A-Za-z0-9*]*@", RegexOptions.Compiled);
+
         public static Traits CleanTraits(TraitsRaw trait)
         {
             var result = new Traits()
@@ -52,7 +51,7 @@ namespace TFT.Search.Library.Repositories
                     variableNamesAccrossTraitEffects = variables.Select(x => x.Key);
                     foreach (var name in variableNamesAccrossTraitEffects)
                     {
-                        var keyword = String.Empty;
+                        var keyword = string.Empty;
                         if (variables.ContainsKey(name) == false) continue;
                         var numberValue = variables[name];
                         Type type = numberValue.GetType();
@@ -72,7 +71,7 @@ namespace TFT.Search.Library.Repositories
                 {
                     foreach (var name in variableNamesAccrossTraitEffects)
                     {
-                        var keyword = String.Empty;
+                        var keyword = string.Empty;
                         if (variables.ContainsKey(name) == false) continue;
                         var numberValue = variables[name];
                         Type type = numberValue.GetType();
@@ -90,7 +89,7 @@ namespace TFT.Search.Library.Repositories
                      * foreach (var name in variableNamesAccrossTraitEffects)
 {
     // 1. Use TryGetValue to avoid looking up the key twice
-    if (!variables.TryGetValue(name, out var numberValue) || numberValue == null) 
+    if (!variables.TryGetValue(name, out var numberValue) || numberValue == null)
         continue;
 
     // 2. Cache type or use pattern matching to avoid multiple GetType/Name calls
@@ -105,7 +104,7 @@ namespace TFT.Search.Library.Repositories
     {
         var rounded = Math.Round(decimalNumberValue).ToString();
         var parsedForPercentage = ParseScalingValues(rounded);
-        
+
         // 4. Update the scaled value efficiently
         scaledValues[name] += $"/{parsedForPercentage}";
     }
@@ -114,15 +113,14 @@ namespace TFT.Search.Library.Repositories
                 }
             }
 
-            Regex ItemRegex = new Regex("@[A-Za-z0-9*]*@", RegexOptions.Compiled);
             //if (this.Name == "Voracity")
             //    Debug.WriteLine("catch");
 
-            foreach (Match ItemMatch in ItemRegex.Matches(trait.Description))
+            foreach (Match match in TagPattern.Matches(trait.Description))
             {
-                var tagName = ItemMatch.Value.Replace('@', ' ').Trim();
+                var tagName = match.Value.Replace('@', ' ').Trim();
                 //  This is only if it's a percentage, I think
-                string[] possibleTagNames = new string[0];
+                var possibleTagNames = Array.Empty<string>();
                 //  I don't know why they put astrisks in the tags sometimes
                 if (tagName.Contains('*'))
                 {
@@ -131,12 +129,12 @@ namespace TFT.Search.Library.Repositories
                 }
 
                 //  This is not precise, but works 95% of the time for now
-                string matchValue = String.Empty;
+                string matchValue = string.Empty;
                 if (tagName == "MinUnits")
                     matchValue = result.UnitScale;
                 else
                     scaledValues.TryGetValue(tagName, out matchValue);
-                trait.Description = trait.Description.Replace(ItemMatch.Value, matchValue);
+                trait.Description = trait.Description.Replace(match.Value, matchValue);
             }
             result.Description = trait.Description;
             return result;
@@ -144,7 +142,7 @@ namespace TFT.Search.Library.Repositories
 
         private static string ParseScalingValues(string value)
         {
-            string matchValue = "";
+            string matchValue = string.Empty;
             decimal number = 0;
             if (Decimal.TryParse(value, out number))
             {

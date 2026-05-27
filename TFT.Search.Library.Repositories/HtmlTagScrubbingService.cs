@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace TFT.Search.Library.Repositories
 {
@@ -23,8 +18,7 @@ namespace TFT.Search.Library.Repositories
             var newLineAdded = Regex.Replace(description, "<\\bbr\\b>", "\r\n");
             var descriptionCleanedofTags = Regex.Replace(newLineAdded, "<[A-Za-z]*>|<\\/[A-Za-z]*>", "");
             var descriptionCleaned = Regex.Replace(descriptionCleanedofTags, "\\(%i:[A-Za-z]*%\\)|%[A-Za-z:]*%", "");
-            var spacesConverted = descriptionCleaned.Replace("&nbsp;", " ");
-            return spacesConverted;
+            return descriptionCleaned.Replace("&nbsp;", " ");
         }
     }
 }

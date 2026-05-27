@@ -1,14 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace TFT.Search.Library.Models.RawData
 {
-    public class ItemRaw: BaseModel
+    public class ItemRaw : BaseModel
     {
         [JsonProperty("apiName")]
         [JsonPropertyName("apiName")]
@@ -46,6 +42,4 @@ namespace TFT.Search.Library.Models.RawData
         [JsonPropertyName("unique")]
         public bool Unique { get; set; }
     }
-
-
 }

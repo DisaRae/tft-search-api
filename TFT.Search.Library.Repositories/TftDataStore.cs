@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TFT.Search.Library.Models.RawData;
+using System;
 using TFT.Search.Library.Models;
 
 namespace TFT.Search.Library.Repositories
@@ -14,7 +9,6 @@ namespace TFT.Search.Library.Repositories
     public class TftDataStore
     {
         public Set CurrentSet { get; set; }
-        public IEnumerable<Set> AllSets { get; set; }
         public int CurrentSetId { get; set; }
         public DateTime? DataLastRetrieved { get; set; }
 

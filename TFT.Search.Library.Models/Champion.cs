@@ -1,13 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using TFT.Search.Library.Models.RawData;
-using static System.Net.WebRequestMethods;
 
 namespace TFT.Search.Library.Models
 {
@@ -32,7 +25,7 @@ namespace TFT.Search.Library.Models
         public List<string> Traits { get; set; }
     }
 
-    public class ChampionAbility: BaseModel
+    public class ChampionAbility : BaseModel
     {
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -70,5 +63,4 @@ namespace TFT.Search.Library.Models
         [JsonProperty("range")]
         public double? Range { get; set; }
     }
-
 }

@@ -1,10 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace TFT.Search.Library.Models
 {
@@ -25,7 +21,6 @@ namespace TFT.Search.Library.Models
         [JsonProperty("desc")]
         [JsonPropertyName("desc")]
         public string Description { get; set; }
-
 
         [JsonProperty("effects")]
         [JsonPropertyName("effects")]
@@ -55,6 +50,4 @@ namespace TFT.Search.Library.Models
         [JsonPropertyName("unique")]
         public bool Unique { get; set; }
     }
-
-
 }

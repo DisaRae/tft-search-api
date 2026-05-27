@@ -1,4 +1,3 @@
-﻿
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,6 @@ namespace TFT.Search.Api.Controllers
     public class ChampionsController : Controller
     {
         private readonly TftDataStore _builder;
-        private const string _key = "53567bbe-4d5f-4513-8595-3d9417839f93";
 
         //private readonly ILogger _logger;
 
@@ -33,21 +31,17 @@ namespace TFT.Search.Api.Controllers
         [HttpGet, Route("{name}")]
         public IEnumerable<Champion> Champions(string name)
         {
-            var currentSetChampions = _builder.CurrentSet?.Champions;
             if (_builder.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
-            var foundChampions = currentSetChampions.Where(x => (x.Name ?? String.Empty).ToLower() == name.ToLower());
-            return foundChampions;
+            return _builder.CurrentSet.Champions.Where(x => (x.Name ?? string.Empty).ToLower() == name.ToLower());
         }
 
         [HttpGet, Route("skills/{keyword}")]
         public IEnumerable<Champion> SearchChampionSkills(string keyword)
         {
-            var currentSetChampions = _builder.CurrentSet?.Champions;
             if (_builder.CurrentSet?.Champions == null)
                 throw new Exception("Unable to retrieve TFT data at this time");
-            var foundChampions = currentSetChampions.Where(x => (x.Ability?.Description ?? String.Empty).ToLower().Contains(keyword.ToLower()));
-            return foundChampions;
+            return _builder.CurrentSet.Champions.Where(x => (x.Ability?.Description ?? string.Empty).ToLower().Contains(keyword.ToLower()));
         }
     }
 }

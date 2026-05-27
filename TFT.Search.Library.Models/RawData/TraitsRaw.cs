@@ -1,35 +1,23 @@
-﻿using Newtonsoft.Json;
-using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using TFT.Search.Library.Models.RawData;
 
 namespace TFT.Search.Library.Models
 {
     public class TraitsRaw : BaseModel
     {
+        [JsonProperty("name")]
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
+        [JsonProperty("apiName")]
         [JsonPropertyName("apiName")]
         public string ApiName { get; set; }
 
+        [JsonProperty("effects")]
         [JsonPropertyName("effects")]
         public List<Effects> Effects { get; set; }
-
-        public string UnitScale
-        {
-            get
-            {
-                string unitScale = string.Empty;
-                Effects.Select(x=>x.MinUnits).ToList().ForEach(x=>unitScale += (x.ToString()+"/"));
-                return unitScale;
-            }
-        }
     }
 
     public class Effects

@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using TFT.Search.Library.Models.RawData;
 
 namespace TFT.Search.Library.Repositories
 {
     internal static class ChampionAbilityValueTagPopulationService
     {
+        private static readonly Regex TagPattern = new Regex("@[A-Za-z0-9*]*@", RegexOptions.Compiled);
+
         public static ChampionAbilityRaw FormatDescription(ChampionAbilityRaw ability)
         {
             //  Don't want the UI to break with any nulls so empty string is fine
@@ -21,14 +20,13 @@ namespace TFT.Search.Library.Repositories
             }
             ability.Description = HtmlTagScrubbingService.ScrubHtmlTags(ability.Description ?? string.Empty);
 
-            Regex ItemRegex = new Regex("@[A-Za-z0-9*]*@", RegexOptions.Compiled);
             //if (this.Name == "Voracity")
             //    Debug.WriteLine("catch");
 
-            foreach (Match ItemMatch in ItemRegex.Matches(ability.Description))
+            foreach (Match match in TagPattern.Matches(ability.Description))
             {
-                var tagName = ItemMatch.Value.Replace('@', ' ').Trim();
-                string[] possibleTagNames = new string[0];
+                var tagName = match.Value.Replace('@', ' ').Trim();
+                var possibleTagNames = Array.Empty<string>();
                 //  I don't know why they put astrisks in the tags sometimes
                 if (tagName.Contains('*'))
                 {
@@ -40,7 +38,7 @@ namespace TFT.Search.Library.Repositories
                 var potentialValues = ability.Variables.AsEnumerable().FirstOrDefault(x => tagName.Contains(x.Name) || x.Name.Contains(tagName));
 
                 //  There is a list of potential stat values that may or may not scale depending on star level
-                string matchValue = "";
+                string matchValue = string.Empty;
                 if (potentialValues != null && potentialValues?.Value != null)
                 {
                     //  If all the variable values are the same, then it's a non-scaling stat
@@ -50,14 +48,14 @@ namespace TFT.Search.Library.Repositories
                     else
                         matchValue = ParseScalingValues(potentialValues);
                 }
-                ability.Description = ability.Description.Replace(ItemMatch.Value, matchValue);
+                ability.Description = ability.Description.Replace(match.Value, matchValue);
             }
             return ability;
         }
 
         private static string ParseNonScalingValues(string[] possibleTagNames, VariableRaw potentialValues)
         {
-            string matchValue = "";
+            string matchValue = string.Empty;
             if (possibleTagNames.Length > 1)
             {
                 var calculatedValue = potentialValues.Value[0] * Convert.ToInt32(possibleTagNames[1]);
@@ -80,12 +78,11 @@ namespace TFT.Search.Library.Repositories
 
         private static string ParseScalingValues(VariableRaw potentialValues)
         {
-            string matchValue = "";
+            string matchValue = string.Empty;
             potentialValues.Value.ForEach(x =>
             {
                 if (x != 0)
                 {
-
                     if (x < 1)
                     {
                         x = Math.Round(x ?? 0, 2) * 100;

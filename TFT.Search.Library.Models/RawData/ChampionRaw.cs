@@ -1,14 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace TFT.Search.Library.Models.RawData
 {
@@ -48,7 +40,7 @@ namespace TFT.Search.Library.Models.RawData
                 _squareIcon = value;
             }
         }
-        public string _squareIcon;
+        private string _squareIcon;
 
         [JsonProperty("stats")]
         [JsonPropertyName("stats")]

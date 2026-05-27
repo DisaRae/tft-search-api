@@ -1,23 +1,18 @@
-﻿using Flurl.Http;
+using Flurl.Http;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using TFT.Search.Library.Models;
 using TFT.Search.Library.Models.RawData;
 
 namespace TFT.Search.Library.Repositories
 {
+    /// <summary>
+    /// This is the class that pulls the raw JSON from Community Dragon
+    /// </summary>
     public interface ITftRepository
     {
         RawCdragon GetJsonFile();
     }
 
-    /// <summary>
-    /// This is the class that pulls the raw JSON from Community Dragon
-    /// </summary>
-    public class TftRepository: ITftRepository
+    public class TftRepository : ITftRepository
     {
         public RawCdragon GetJsonFile()
         {
