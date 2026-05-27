@@ -19,6 +19,8 @@ namespace TFT.Search.Library.Models.RawData
             get
             {
                 var replacedImageType = (_icon ?? string.Empty).Replace(".dds", ".png").Replace(".tex", ".png");
+                if (replacedImageType.StartsWith(_imageBaseUrl))
+                    return replacedImageType;
                 return _imageBaseUrl + replacedImageType.ToLower() ?? string.Empty;
             }
             set
