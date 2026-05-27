@@ -32,7 +32,10 @@ namespace TFT.Search.Library.Repositories
 
         public async Task RefreshDataAsync()
         {
-            _tftData = await LoadRawDataAsync();
+            var newData = await LoadRawDataAsync();
+            //  null means the server returned 304 Not Modified — existing data is still current
+            if (newData != null)
+                _tftData = newData;
         }
 
         public int? GetCurrentSetId()
