@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using TFT.Search.Library.Models;
 
 namespace TFT.Search.Library.Repositories
@@ -17,15 +18,16 @@ namespace TFT.Search.Library.Repositories
         public TftDataStore(ITftService tftService)
         {
             _tftService = tftService;
-            CheckDataLastRetrievedAndRefreshIfNecessary();
+            // Constructors cannot be async; this single blocking call is acceptable at DI startup time.
+            CheckDataLastRetrievedAndRefreshIfNecessaryAsync().GetAwaiter().GetResult();
             DataLastRetrieved = DateTime.Now.AddMinutes(-5);
         }
 
-        public void CheckDataLastRetrievedAndRefreshIfNecessary()
+        public async Task CheckDataLastRetrievedAndRefreshIfNecessaryAsync()
         {
             if ((DataLastRetrieved ?? DateTime.MinValue).AddHours(2) < DateTime.Now)
             {
-                _tftService.RefreshData();
+                await _tftService.RefreshDataAsync();
                 CurrentSetId = _tftService.GetCurrentSetId() ?? 0;
                 // We aren't using historic sets, so why waste resouces cleaning and populating it?
                 //AllSets = _tftService.GetSets();

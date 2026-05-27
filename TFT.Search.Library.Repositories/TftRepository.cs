@@ -1,5 +1,6 @@
 using Flurl.Http;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 using TFT.Search.Library.Models.RawData;
 
 namespace TFT.Search.Library.Repositories
@@ -9,17 +10,16 @@ namespace TFT.Search.Library.Repositories
     /// </summary>
     public interface ITftRepository
     {
-        RawCdragon GetJsonFile();
+        Task<RawCdragon> GetJsonFileAsync();
     }
 
     public class TftRepository : ITftRepository
     {
-        public RawCdragon GetJsonFile()
+        public async Task<RawCdragon> GetJsonFileAsync()
         {
             var url = "https://raw.communitydragon.org/latest/cdragon/tft/en_us.json";
 
-            var request = url.GetJsonAsync();
-            var result = request.GetAwaiter().GetResult();
+            var result = await url.GetJsonAsync();
             //  Returns dynamic and we want a string
             var stringResult = JsonConvert.SerializeObject(result);
             //  Map to data objects
