@@ -79,33 +79,33 @@ namespace TFT.Search.Library.Repositories
             if (rawSet == null || rawSet.Champions == null || rawSet.Traits == null)
                 return null;
 
-            // Make deep copies so we do not mutate original rawSet
-            var deepCopyChampions = DeepCopyObjectExtension.DeepCopy<List<ChampionRaw>>(rawSet.Champions) ?? new List<ChampionRaw>();
-            var deepCopyTraits = DeepCopyObjectExtension.DeepCopy<List<TraitsRaw>>(rawSet.Traits) ?? new List<TraitsRaw>();
-
             // Prepare containers for cleaned data
             List<Champion> finalChampions = null;
             List<Traits> finalTraits = null;
             IEnumerable<Item> items = null;
             IEnumerable<Augment> augments = null;
 
-            // Clean champions: format ability descriptions then map to DTO
+            // Clean champions: single JSON round trip maps ChampionRaw → Champion, then apply
+            // formatted descriptions using the original raw data (which still has Variables).
+            // FormatDescription is non-mutating so no deep copy of rawSet is needed.
+            var sourceChampions = rawSet.Champions ?? new List<ChampionRaw>();
             var championTask = Task.Run(() =>
             {
-                foreach (var champ in deepCopyChampions)
+                var serialized = JsonConvert.SerializeObject(sourceChampions);
+                var mapped = JsonConvert.DeserializeObject<List<Champion>>(serialized) ?? new List<Champion>();
+                for (int i = 0; i < mapped.Count && i < sourceChampions.Count; i++)
                 {
-                    if (champ.Ability != null)
-                        champ.Ability = ChampionAbilityValueTagPopulationService.FormatDescription(champ.Ability);
+                    if (mapped[i].Ability != null && sourceChampions[i].Ability != null)
+                        mapped[i].Ability.Description = ChampionAbilityValueTagPopulationService.FormatDescription(sourceChampions[i].Ability);
                 }
-                var serialized = JsonConvert.SerializeObject(deepCopyChampions);
-                finalChampions = JsonConvert.DeserializeObject<List<Champion>>(serialized) ?? new List<Champion>();
+                finalChampions = mapped;
             });
 
-            // Clean traits
+            // Clean traits — CleanTraits is non-mutating so no deep copy of rawSet is needed.
             var traitsTask = Task.Run(() =>
             {
                 var list = new List<Traits>();
-                foreach (var tr in deepCopyTraits)
+                foreach (var tr in rawSet.Traits ?? new List<TraitsRaw>())
                 {
                     var cleaned = TraitScrubbingService.CleanTraits(tr);
                     if (cleaned != null)
