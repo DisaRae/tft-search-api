@@ -54,13 +54,19 @@ namespace TFT.Search.Library.Repositories
                         var keyword = string.Empty;
                         if (variables.ContainsKey(name) == false) continue;
                         var numberValue = variables[name];
-                        Type type = numberValue.GetType();
-                        if (numberValue is null || numberValue.ToString() == "null" || type.IsArray || type.Name == "JArray")
+                        //  null check must come before GetType() — calling GetType() on a null dynamic throws RuntimeBinderException
+                        if (numberValue is null || numberValue.ToString() == "null")
                         {
                             scaledValues.Add(name, keyword);
                             continue;
                         }
-                        var canParse = Decimal.TryParse(numberValue, out decimal decimalNumberValue);
+                        Type type = numberValue.GetType();
+                        if (type.IsArray || type.Name == "JArray")
+                        {
+                            scaledValues.Add(name, keyword);
+                            continue;
+                        }
+                        var canParse = Decimal.TryParse(numberValue.ToString(), out decimal decimalNumberValue);
                         keyword = canParse ? Math.Round(decimalNumberValue).ToString() : string.Empty;
                         var parsedForPercentage = ParseScalingValues(keyword);
                         if (scaledValues.ContainsKey(name) == false)
@@ -74,13 +80,19 @@ namespace TFT.Search.Library.Repositories
                         var keyword = string.Empty;
                         if (variables.ContainsKey(name) == false) continue;
                         var numberValue = variables[name];
-                        Type type = numberValue.GetType();
-                        if (numberValue is null || numberValue.ToString() == "null" || type.IsArray || type.Name == "JArray")
+                        //  null check must come before GetType() — calling GetType() on a null dynamic throws RuntimeBinderException
+                        if (numberValue is null || numberValue.ToString() == "null")
                         {
                             scaledValues[name] += keyword;
                             continue;
                         }
-                        var canParse = Decimal.TryParse(numberValue, out decimal decimalNumberValue);
+                        Type type = numberValue.GetType();
+                        if (type.IsArray || type.Name == "JArray")
+                        {
+                            scaledValues[name] += keyword;
+                            continue;
+                        }
+                        var canParse = Decimal.TryParse(numberValue.ToString(), out decimal decimalNumberValue);
                         keyword = canParse ? Math.Round(decimalNumberValue).ToString() : string.Empty;
                         var parsedForPercentage = ParseScalingValues(keyword);
                         scaledValues[name] += ("/" + parsedForPercentage);
